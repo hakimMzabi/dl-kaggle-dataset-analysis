@@ -1,0 +1,1 @@
+pip3 install absl-py astor backports.weakrefenum34gast google_pasta h5pykeras_preprocessing numpyopt_einsum protobuf tensorboardtensorflow_estimatortermcolor wrapt wheelmockfunctools32six scipy
