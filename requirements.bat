@@ -1,1 +1,1 @@
-pip3 install absl-py astor backports.weakrefenum34gast google_pasta h5pykeras_preprocessing numpyopt_einsum protobuf tensorboardtensorflow_estimatortermcolor wrapt wheelmockfunctools32six scipy
+pip3 install absl-py astor backports.weakref enum34 gast google_pasta h5py keras_preprocessing numpy opt_einsum protobuf tensorboard tensorflow_estimator termcolor wrapt wheel mock functools32 six scipy
