@@ -8,7 +8,7 @@
 py tools/create_new_environment.py
 ```
 
-### Actualisation des paquets de l'environnement.
+### Actualisation des paquets de l'environnement
 
 ```batch script
 py tools/refresh_requirements.py
