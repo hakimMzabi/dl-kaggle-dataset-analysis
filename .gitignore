@@ -2,3 +2,5 @@
 dataset/
 __pycache__/
 *.png
+.ipynb_checkpoints/
+*-checkpoint.ipynb

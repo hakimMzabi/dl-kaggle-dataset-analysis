@@ -171,7 +171,9 @@ def model_fit_2():
                                          batch_size=batch_size),
                             epochs=epochs,
                             validation_data=(x_test, y_test),
-                            workers=4)
+                            workers=4,
+                            use_multiprocessing=True
+                            )
 
     # Save model and weights
     if not os.path.isdir(save_dir):
