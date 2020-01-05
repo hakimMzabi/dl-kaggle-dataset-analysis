@@ -1,9 +1,16 @@
 # dl-kaggle-dataset-analysis
 
-## Générer un fichier _requirements.txt_
+## Outils
 
-Ce projet a été de base exploité avec Anaconda.
-Pour générer un fichier ```requirements.txt```, il faut lancer la commande suivante :
-```shell script
-conda list -e > requirements.txt
+### Création d'un nouvel environnement Anaconda
+
+```batch script
+py tools/create_new_environment.py
 ```
+
+### Actualisation des paquets de l'environnement.
+
+```batch script
+py tools/refresh_requirements.py
+```
+
