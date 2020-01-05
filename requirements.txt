@@ -117,4 +117,3 @@ wrapt=1.11.2=py37he774522_0
 zeromq=4.3.1=h33f27b4_3
 zipp=0.6.0=py_0
 zlib=1.2.11=h62dcd97_3
-[0m
