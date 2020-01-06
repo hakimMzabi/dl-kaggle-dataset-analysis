@@ -1,4 +1,3 @@
-from __future__ import print_function
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -9,27 +8,79 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
-
-ROOT = os.path.dirname(os.path.abspath(__file__))
-CIFAR10_BATCHES_PATH = ROOT + (
-    "\\dataset\\cifar-10-batches-py" if os.name == 'nt' else "/dataset/cifar-10-batches-py")
+from tensorboard.plugins.hparams import api as hp
 
 
-def is_cifar10(dataset_name):
-    return dataset_name == "cifar10"
-
-
-def is_fashion_mnist(dataset_name):
-    return dataset_name == "fashion_mnist"
-
-
-def header():
+def show_config():
     print(f"{'=' * 60} CONFIGURATION {'=' * 60}")
-    print("Project Path:", ROOT)
-    print("CIFAR-10 Path:", CIFAR10_BATCHES_PATH)
     print("GPU Available:", tf.test.is_gpu_available())
     print("Building with CUDA:", tf.test.is_built_with_cuda())
     print(f"{'=' * 135}")
+
+
+def show_home_menu():
+    print(f"{'=' * 60} HOME {'=' * 60}")
+    print("1 - Launch tuner")
+    print("2 - Compare current models")
+    print("3 - Show configuration")
+    print("4 - Activate debug mode")
+    print(f"{'=' * 135}")
+
+def hp_test():
+
+    (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
+    x_train, x_test = x_train / 255.0, x_test / 255.0
+
+    HP_NUM_UNITS = hp.HParam('num_units', hp.Discrete([16, 32]))
+    HP_DROPOUT = hp.HParam('dropout', hp.RealInterval(0.1, 0.2))
+    HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd']))
+
+    METRIC_ACCURACY = 'accuracy'
+
+    with tf.summary.create_file_writer('logs/hparam_tuning').as_default():
+        hp.hparams_config(
+            hparams=[HP_NUM_UNITS, HP_DROPOUT, HP_OPTIMIZER],
+            metrics=[hp.Metric(METRIC_ACCURACY, display_name='Accuracy')],
+        )
+
+    def train_test_model(hparams):
+        model = tf.keras.models.Sequential([
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(hparams[HP_NUM_UNITS], activation=tf.nn.relu),
+            tf.keras.layers.Dropout(hparams[HP_DROPOUT]),
+            tf.keras.layers.Dense(10, activation=tf.nn.softmax),
+        ])
+        model.compile(
+            optimizer=hparams[HP_OPTIMIZER],
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy'],
+        )
+
+        model.fit(x_train, y_train, epochs=1)  # Run with 1 epoch to speed things up for demo purposes
+        _, accuracy = model.evaluate(x_test, y_test)
+        return accuracy
+
+    def run(run_dir, hparams):
+        with tf.summary.create_file_writer(run_dir).as_default():
+            hp.hparams(hparams)  # record the values used in this trial
+            accuracy = train_test_model(hparams)
+            tf.summary.scalar(METRIC_ACCURACY, accuracy, step=1)
+
+    session_num = 0
+
+    for num_units in HP_NUM_UNITS.domain.values:
+        for dropout_rate in (HP_DROPOUT.domain.min_value, HP_DROPOUT.domain.max_value):
+            for optimizer in HP_OPTIMIZER.domain.values:
+                hparams = {
+                    HP_NUM_UNITS: num_units,
+                    HP_DROPOUT: dropout_rate,
+                    HP_OPTIMIZER: optimizer,
+                }
+                run_name = "run-%d" % session_num
+                print('--- Starting trial: %s' % run_name)
+                print({h.name: hparams[h] for h in hparams})
+                run('logs/hparam_tuning/' + run_name, hparams)
+                session_num += 1
 
 
 def show_first_samples(x_train, y_train):
@@ -67,6 +118,7 @@ def create_model(dataset_name):
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=[tf.keras.losses.sparse_categorical_crossentropy])
     return model
+
 
 def model_fit_2():
     batch_size = 32
@@ -187,10 +239,11 @@ def model_fit_2():
     print('Test loss:', scores[0])
     print('Test accuracy:', scores[1])
 
+
 def model_fit(dataset_name):
-    if is_cifar10(dataset_name):
+    if dataset_name == "cifar10":
         dataset = cifar10
-    elif is_fashion_mnist(dataset_name):
+    elif dataset_name == "fashion_mnist":
         dataset = fashion_mnist
     else:
         print("Error: No dataset name found for fitting.")
@@ -207,7 +260,4 @@ def model_fit(dataset_name):
               epochs=100,
               batch_size=8192)
 
-
-header()
-# model_fit("fashion_mnist")
-model_fit_2()
+hp_test()
