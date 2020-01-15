@@ -1,4 +1,5 @@
 import os
+import matplotlib.pyplot as plt
 
 '''
 Helper class is here to help the developer debugging machine learning resources and variables and manage processes.
@@ -8,6 +9,13 @@ Helper class is here to help the developer debugging machine learning resources 
 class Helper:
     def __init__(self):
         pass
+
+    @staticmethod
+    def show_samples(x_train, y_train):
+        for i in range(10):
+            plt.imshow(x_train[i])
+            print(y_train[i])
+            plt.show()
 
     @staticmethod
     def create_dir(path):
