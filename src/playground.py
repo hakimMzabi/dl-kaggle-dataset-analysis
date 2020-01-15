@@ -266,4 +266,5 @@ if __name__ == "__main__":
     header()
     # model_fit("fashion_mnist")
     model_fit_2()
+
     model_test_1()
