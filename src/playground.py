@@ -1,4 +1,6 @@
 import os
+import numpy as np
+from .helper import Helper
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import tensorflow.keras as keras
@@ -8,79 +10,27 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPooling2D
-from tensorboard.plugins.hparams import api as hp
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+CIFAR10_BATCHES_PATH = ROOT + (
+    "\\dataset\\cifar-10-batches-py" if os.name == 'nt' else "/dataset/cifar-10-batches-py")
 
 
-def show_config():
+def is_cifar10(dataset_name):
+    return dataset_name == "cifar10"
+
+
+def is_fashion_mnist(dataset_name):
+    return dataset_name == "fashion_mnist"
+
+
+def header():
     print(f"{'=' * 60} CONFIGURATION {'=' * 60}")
+    print("Project Path:", ROOT)
+    print("CIFAR-10 Path:", CIFAR10_BATCHES_PATH)
     print("GPU Available:", tf.test.is_gpu_available())
     print("Building with CUDA:", tf.test.is_built_with_cuda())
     print(f"{'=' * 135}")
-
-
-def show_home_menu():
-    print(f"{'=' * 60} HOME {'=' * 60}")
-    print("1 - Launch tuner")
-    print("2 - Compare current models")
-    print("3 - Show configuration")
-    print("4 - Activate debug mode")
-    print(f"{'=' * 135}")
-
-def hp_test():
-
-    (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
-
-    HP_NUM_UNITS = hp.HParam('num_units', hp.Discrete([16, 32]))
-    HP_DROPOUT = hp.HParam('dropout', hp.RealInterval(0.1, 0.2))
-    HP_OPTIMIZER = hp.HParam('optimizer', hp.Discrete(['adam', 'sgd']))
-
-    METRIC_ACCURACY = 'accuracy'
-
-    with tf.summary.create_file_writer('logs/hparam_tuning').as_default():
-        hp.hparams_config(
-            hparams=[HP_NUM_UNITS, HP_DROPOUT, HP_OPTIMIZER],
-            metrics=[hp.Metric(METRIC_ACCURACY, display_name='Accuracy')],
-        )
-
-    def train_test_model(hparams):
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(hparams[HP_NUM_UNITS], activation=tf.nn.relu),
-            tf.keras.layers.Dropout(hparams[HP_DROPOUT]),
-            tf.keras.layers.Dense(10, activation=tf.nn.softmax),
-        ])
-        model.compile(
-            optimizer=hparams[HP_OPTIMIZER],
-            loss='sparse_categorical_crossentropy',
-            metrics=['accuracy'],
-        )
-
-        model.fit(x_train, y_train, epochs=1)  # Run with 1 epoch to speed things up for demo purposes
-        _, accuracy = model.evaluate(x_test, y_test)
-        return accuracy
-
-    def run(run_dir, hparams):
-        with tf.summary.create_file_writer(run_dir).as_default():
-            hp.hparams(hparams)  # record the values used in this trial
-            accuracy = train_test_model(hparams)
-            tf.summary.scalar(METRIC_ACCURACY, accuracy, step=1)
-
-    session_num = 0
-
-    for num_units in HP_NUM_UNITS.domain.values:
-        for dropout_rate in (HP_DROPOUT.domain.min_value, HP_DROPOUT.domain.max_value):
-            for optimizer in HP_OPTIMIZER.domain.values:
-                hparams = {
-                    HP_NUM_UNITS: num_units,
-                    HP_DROPOUT: dropout_rate,
-                    HP_OPTIMIZER: optimizer,
-                }
-                run_name = "run-%d" % session_num
-                print('--- Starting trial: %s' % run_name)
-                print({h.name: hparams[h] for h in hparams})
-                run('logs/hparam_tuning/' + run_name, hparams)
-                session_num += 1
 
 
 def show_first_samples(x_train, y_train):
@@ -223,9 +173,7 @@ def model_fit_2():
                                          batch_size=batch_size),
                             epochs=epochs,
                             validation_data=(x_test, y_test),
-                            workers=4,
-                            use_multiprocessing=True
-                            )
+                            workers=4)
 
     # Save model and weights
     if not os.path.isdir(save_dir):
@@ -241,9 +189,9 @@ def model_fit_2():
 
 
 def model_fit(dataset_name):
-    if dataset_name == "cifar10":
+    if is_cifar10(dataset_name):
         dataset = cifar10
-    elif dataset_name == "fashion_mnist":
+    elif is_fashion_mnist(dataset_name):
         dataset = fashion_mnist
     else:
         print("Error: No dataset name found for fitting.")
@@ -260,4 +208,63 @@ def model_fit(dataset_name):
               epochs=100,
               batch_size=8192)
 
-hp_test()
+
+def model_test_1():
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+
+    helper = Helper()
+    helper.debug_dataset_shapes("cifar_10", [x_train, y_train, x_test, y_test])
+
+    X_train = np.array([
+        [1, 2, 3, 4],
+        [4, 5, 6, 7],
+        [8, 9, 10, 11],
+        [12, 13, 14, 15],
+        [5, 6, 1, 0],
+        [6, 7, 4, 2],
+        [2, 1, 3, 1],
+        [3, 9, 4, 2]
+    ])
+
+    Y_train = np.array([
+        [1, 1, 1, 1, 0, 0, 0, 0]
+    ])
+
+    X_test = np.array([
+        [16, 17, 18, 19],
+        [10, 18, 19, 17]
+    ])
+
+    Y_test = np.array([
+        [1, 0]
+    ])
+
+    X_train = X_train.reshape(8, 4)
+    Y_train = Y_train.reshape(8, 1)
+    X_test = X_test.reshape(2, 4)
+    Y_test = Y_test.reshape(2, 1)
+
+    helper.debug_dataset_shapes("dummy", [X_train, Y_train, X_test, Y_test])
+
+    model = tf.keras.Sequential()
+
+    model.add(tf.keras.layers.Dense(128, input_shape=X_train.shape[1:]))
+    model.add(tf.keras.layers.Dense(128))
+    model.add(tf.keras.layers.Dense(128))
+    model.compile(
+        optimizer='adam',
+        loss=tf.keras.losses.sparse_categorical_crossentropy,
+        metric=['accuracy']
+    )
+    model.build()
+    model.summary()
+
+    model.fit(X_train, Y_train, epochs=100, batch_size=64, validation_data=(X_test, Y_test))
+
+
+if __name__ == "__main__":
+    header()
+    # model_fit("fashion_mnist")
+    model_fit_2()
+
+    model_test_1()
