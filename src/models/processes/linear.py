@@ -1,3 +1,7 @@
+"""
+Linear process that cannot generate models for the CIFAR-10 dataset.
+"""
+
 import matplotlib.patches as mpatches
 import numpy as np
 import matplotlib.pyplot as plt
