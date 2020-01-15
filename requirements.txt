@@ -20,3 +20,4 @@ mock
 six
 scipy
 scikit-learn
+pandas
