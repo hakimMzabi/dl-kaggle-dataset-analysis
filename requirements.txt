@@ -19,3 +19,4 @@ wheel
 mock
 six
 scipy
+scikit-learn
