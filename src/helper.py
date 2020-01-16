@@ -1,6 +1,8 @@
 import os
 import tensorflow as tf
 import matplotlib.pyplot as plt
+
+from src.reporter import Reporter
 from tensorflow.keras.datasets import cifar10
 
 
@@ -12,6 +14,7 @@ class Helper:
     def __init__(self):
         self.accepted_processes = ["mlp", "convnet", "resnet", "rnn"]
         self.models_folder = "../responses/"
+        self.checkpoint_folder = "../checkpoints/"
 
     def process_name_is_valid(self, process_name) -> bool:
         """
@@ -142,7 +145,8 @@ class Helper:
     def get_cifar10_prepared() -> (tuple, tuple):
         """
         Returns the cifar10 dataset normalized and well shaped for training as 2 tuples of 4 tensors
-        :return: (tuple1 : 2 training tensors of features and labels, tuple2 : 2 validation tensors of features and labels)
+        :return: (tuple1 : 2 training tensors of features and labels, tuple2 : 2 validation tensors of
+        features and labels)
         """
         (x_train, y_train), (x_test, y_test) = cifar10.load_data()
         # Normalize the data
@@ -163,3 +167,47 @@ class Helper:
             return tf.keras.models.load_model(model_filename)
         except FileNotFoundError:
             print("Error: Couldn't load the model. Check if the file exists.")
+
+    def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name):
+        """
+        Fit a model and adds a checkpoint to avoid losing data in case of failure.
+        Checkpoint is also useful in case of overfitting
+        :param model: tensorflow keras model
+        :param x_train: features
+        :param y_train: labels
+        :param batch_size:
+        :param epochs:
+        :param validation_data: test features and test labels
+        :return: nothing
+        """
+        (x_test, y_test) = validation_data
+
+        model_name = self.get_models_last_filename(process_name) \
+            .replace(".h5", "") \
+            .replace("../responses/", "")
+        log_file_path = "../logs/" + model_name + ".log"
+        checkpoint_file_path = "../checkpoints/" + model_name + ".ckpt"
+
+        print(f"Creating the log file for the current model ({model_name})...")
+        f = open(f"{log_file_path}", "w")
+        f.close()
+        print(f"Log file successfully created for the current model ({model_name})!")
+        print(f"Creating the checkpoint for the current model ({model_name})")
+        f = open(f"{checkpoint_file_path}", "w")
+        f.close()
+        print(f"Checkpoint file successfully ")
+
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(
+            filepath=checkpoint_file_path,
+            save_weights_only=True,
+            verbose=1
+        )
+
+        model.fit(
+            x_train,
+            y_train,
+            batch_size=batch_size,
+            epochs=epochs,
+            validation_data=(x_test, y_test),
+            callbacks=[Reporter(x_train, y_train, batch_size, model_name, log_file_path), cp_callback]
+        )
