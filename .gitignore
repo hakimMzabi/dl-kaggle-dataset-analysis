@@ -6,3 +6,4 @@ __pycache__/
 *-checkpoint.ipynb
 requirements.txt
 logs/
+src/models/checkpoints/

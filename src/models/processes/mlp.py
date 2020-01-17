@@ -10,22 +10,24 @@ from tensorflow.keras.metrics import *
 from src.helper import Helper
 
 
-def create_model_1():
-    model_1 = Sequential()
+def create_model(optimizer=None, dropout_values=None, activation=relu):
+    model = Sequential()
 
-    model_1.add(Dense(96, activation=relu, input_dim=3072))  # 32 * 32 * 3
-    model_1.add(Dropout(0.1))
-    model_1.add(Dense(48, activation=relu))
-    model_1.add(Dropout(0.1))
-    model_1.add(Dense(10, activation=softmax))
+    model.add(Dense(128, activation=activation, input_dim=3072))  # 32 * 32 * 3
+    if dropout_values is not None:
+        model.add(Dropout(dropout_values[0]))
+    model.add(Dense(64, activation=activation))
+    if dropout_values is not None:
+        model.add(Dropout(dropout_values[1]))
+    model.add(Dense(10, activation=softmax))
 
-    model_1.compile(
-        optimizer=Adam(),
+    model.compile(
+        optimizer=optimizer.lower(),
         loss=sparse_categorical_crossentropy,
         metrics=[sparse_categorical_accuracy]
     )
 
-    return model_1
+    return model
 
 
 if __name__ == '__main__':
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     # Load dataset
     (x_train, y_train), (x_test, y_test) = helper.get_cifar10_prepared()
 
-    model = create_model_1()
+    model = create_model()
     helper.save_model(model, "mlp")
     model_loaded = helper.load_model(helper.get_models_last_filename("mlp"))
     model_loaded.summary()

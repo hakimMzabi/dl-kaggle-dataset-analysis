@@ -1,4 +1,3 @@
-import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 
 
@@ -20,9 +19,15 @@ class Reporter(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         self.epoch_iter += 1
-        (loss, acc) = self.model.evaluate(self.x_train, self.y_train, batch_size=self.batch_size)
+        # (loss, acc) = self.model.evaluate(self.x_train, self.y_train, batch_size=self.batch_size)
         f = open(self.log_file_path, "a")
-        f.write("Epoch {} - real loss : {} - real accuracy : {:5.2f}%\n".format(self.epoch_iter, loss, 100 * acc))
+        f.write("Epoch {} - "
+                "loss: {} ; "
+                "sparse_categorical_accuracy : {} ; "
+                "val_loss : {} ; "
+                "val_sparse_categorical_accuracy : {}\n"
+                .format(self.epoch_iter, logs['loss'], logs['sparse_categorical_accuracy'], logs['val_loss'], logs['val_sparse_categorical_accuracy'])
+        )
         f.close()
 
     def on_train_end(self, logs=None):

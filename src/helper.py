@@ -1,4 +1,5 @@
 import os
+import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
@@ -12,17 +13,10 @@ class Helper:
     """
 
     def __init__(self):
-        self.accepted_processes = ["mlp", "convnet", "resnet", "rnn"]
-        self.models_folder = "../responses/"
-        self.checkpoint_folder = "../checkpoints/"
+        self.src_path = os.path.dirname(os.path.realpath(__file__))
+        self.models_responses_folder = self.src_path + "\\models\\responses\\"
+        self.checkpoint_folder = self.src_path + "\\checkpoints\\"
 
-    def process_name_is_valid(self, process_name) -> bool:
-        """
-        Check if the process name is equal to "mlp","convnet","resnet" or rnn
-        :param process_name: mlp, resnet, rnn...
-        :return: True if the process_name is in the accepted_processes, else False
-        """
-        return process_name.lower() in self.accepted_processes
 
     def get_models_last_filename(self, process_name) -> str:
         """
@@ -32,7 +26,7 @@ class Helper:
         """
         models_last_num = self.get_models_last_num(process_name)
         return self.get_model_filename(process_name, models_last_num) if models_last_num != -1 else \
-            "No model found in the \"src/models/responses\" folder."
+            process_name + "_1"
 
     def get_models_last_num(self, process_name) -> int:
         """
@@ -50,9 +44,9 @@ class Helper:
         :param num: id to select for the selected process_name
         :return: the full filename for the selected process_name and num
         """
-        return self.models_folder + process_name.lower() + "_" + str(num) + ".h5" \
-            if self.process_name_is_valid(process_name) and os.path.isdir(self.models_folder) \
-            else "Couldn't get a valid model filename"
+        return self.models_responses_folder + process_name.lower() + "_" + str(num) + ".h5" \
+            if os.path.isdir(self.models_responses_folder) \
+            else "Couldn't get a model filename"
 
     def get_models_last_filename_to_generate(self, process_name) -> str:
         """
@@ -69,16 +63,16 @@ class Helper:
         :param process_name: mlp, resnet, rnn...
         :return: the max number of the model (e.g if mlp_42.h5 is the file with the highest id, it returns 43)
         """
-        if os.path.isdir(self.models_folder):
+        if os.path.isdir(self.models_responses_folder):
             max = 0
-            for (dirpath, dirnames, filenames) in os.walk(self.models_folder):
+            for (dirpath, dirnames, filenames) in os.walk(self.models_responses_folder):
                 for filename in filenames:
                     if process_name.lower() in filename:
                         number = int(filename.split(process_name.lower() + "_")[1].split('.')[0])
                         if number > max:
                             max = number
             return max + 1
-        print(f"Error : The directory {self.models_folder} does not exists")
+        print(f"Error : The directory {self.models_responses_folder} does not exists")
         exit()
 
     def save_model(self, model, process_name):
@@ -88,13 +82,7 @@ class Helper:
         :param process_name: mlp, resnet
         :return: nothing
         """
-        model_filename = ""
-        if self.process_name_is_valid(process_name):
-            print(f"Generating save : {model_filename}...", end="")
-            model.save(self.get_models_last_filename_to_generate(process_name))
-            print("OK")
-        else:
-            print("This type of process is not accepted.")
+        model.save(self.get_models_last_filename_to_generate(process_name))
 
     @staticmethod
     def show_samples(x_train, y_train):
@@ -112,16 +100,25 @@ class Helper:
     @staticmethod
     def create_dir(path):
         """
-        Creates a directory and print an error if it is not possible
+        Creates a directory if it doesn't exist and print an error if it is not possible
         :param path: e.g "/random_dir/the_new_dir/
         :return: nothing
         """
         try:
-            os.mkdir(path)
+            if not os.path.isdir(path):
+                os.mkdir(path)
         except OSError:
             print(f"Couldn't create the dir : {path}")
         else:
             print(f"Successfully created the dir : {path}")
+
+    @staticmethod
+    def list_to_str_semic(list) -> str:
+        res = "["
+        for el in list:
+            res += str(el) + ";"
+        res += "]"
+        return res
 
     @staticmethod
     def debug_dataset_shapes(dataset_name, dataset, terminate=False):
@@ -157,7 +154,8 @@ class Helper:
         x_test = x_test.reshape((10000, 32 * 32 * 3))
         return (x_train, y_train), (x_test, y_test)
 
-    def load_model(self, model_filename=None):
+    @staticmethod
+    def load_model(model_filename=None):
         """
         Returns a tensorflow keras model from the filename
         :param model_filename
@@ -167,6 +165,12 @@ class Helper:
             return tf.keras.models.load_model(model_filename)
         except FileNotFoundError:
             print("Error: Couldn't load the model. Check if the file exists.")
+
+    @staticmethod
+    def create_file(path):
+        print(path)
+        f = open(f"{path}", "w")
+        f.close()
 
     def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name):
         """
@@ -178,30 +182,29 @@ class Helper:
         :param batch_size:
         :param epochs:
         :param validation_data: test features and test labels
+        :param process_name: mlp, convnet, resnet...
         :return: nothing
         """
+
+        self.save_model(model, process_name)
+
         (x_test, y_test) = validation_data
 
-        model_name = self.get_models_last_filename(process_name) \
-            .replace(".h5", "") \
-            .replace("../responses/", "")
-        log_file_path = "../logs/" + model_name + ".log"
-        checkpoint_file_path = "../checkpoints/" + model_name + ".ckpt"
+        model_name = self.get_models_last_filename(process_name).split("\\")[-1].replace(".h5", "")
+        log_file_path = self.src_path + "\\models\\logs\\" + model_name + ".log"
+        checkpoint_file_path = self.src_path + "\\models\\checkpoints\\" + model_name + ".ckpt"
+        tensorboard_log_dir = self.src_path + "\\models\\logs\\tensorboard_" + model_name + "\\fit\\" + datetime.datetime.now()\
+            .strftime("%Y%m%d-%H%M%S")
 
-        print(f"Creating the log file for the current model ({model_name})...")
-        f = open(f"{log_file_path}", "w")
-        f.close()
-        print(f"Log file successfully created for the current model ({model_name})!")
-        print(f"Creating the checkpoint for the current model ({model_name})")
-        f = open(f"{checkpoint_file_path}", "w")
-        f.close()
-        print(f"Checkpoint file successfully ")
+        self.create_file(log_file_path)
+        self.create_file(checkpoint_file_path)
 
         cp_callback = tf.keras.callbacks.ModelCheckpoint(
             filepath=checkpoint_file_path,
             save_weights_only=True,
             verbose=1
         )
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_dir, histogram_freq=1)
 
         model.fit(
             x_train,
@@ -209,5 +212,9 @@ class Helper:
             batch_size=batch_size,
             epochs=epochs,
             validation_data=(x_test, y_test),
-            callbacks=[Reporter(x_train, y_train, batch_size, model_name, log_file_path), cp_callback]
+            callbacks=[
+                Reporter(x_train, y_train, batch_size, model_name, log_file_path),
+                cp_callback,
+                tensorboard_callback
+            ]
         )
