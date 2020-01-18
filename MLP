@@ -1,0 +1,21 @@
+import matplotlib.pyplot as plt
+from tensorflow.keras.activations import *
+from tensorflow.keras.datasets import *
+from tensorflow.keras.layers import *
+from tensorflow.keras.metrics import *
+from tensorflow.keras.models import *
+from tensorflow.keras.optimizers import *
+from tensorflow.keras.utils import plot_model
+
+
+(x_train, y_train), (x_val, y_val) = datasets.cifar10.load_data()
+model = Sequential()
+model.add(Dense(128, activation='relu', input_shape=(32,32,3)))
+model.add(Dense(128, activation='relu'))
+model.add(Flatten())
+model.add(Dense(10, activation='relu'))
+model.compile(optimizer='Adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=10, batch_size=2048)
