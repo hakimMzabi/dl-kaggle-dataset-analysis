@@ -11,7 +11,7 @@ from tensorflow.keras.losses import *
 from tensorflow.keras.layers import *
 import matplotlib.pyplot as plt
 
-CIFAR_10_BATCH_PATH = "./dataset/cifar-10-batches-py"
+CIFAR_10_BATCH_PATH = "../dataset/cifar-10-batches-py"
 
 '''def unpickle(file):
     with open(file, 'rb') as fo:
