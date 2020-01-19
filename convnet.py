@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 
 TEST_NAME = "tf2_convnet_mlp_epochs=100"
 
-
+# ---3s 66us/sample - loss: 0.3325 - categorical_accuracy: 0.8829 - val_loss: 0.5924 - val_categorical_accuracy: 0.8178 BEST
 # -----loss: 0.3161 - categorical_accuracy: 0.8874 - val_loss: 0.7152 - val_categorical_accuracy: 0.7836
 # 10000/1 - 1s - loss: 0.4760 - categorical_accuracy: 0.7836 : epochs 100; batch size : 64
 # ------loss: 0.0186 - categorical_accuracy: 0.8458 - val_loss: 0.0804 - val_categorical_accuracy: 0.7406---------- :
@@ -20,31 +20,36 @@ TEST_NAME = "tf2_convnet_mlp_epochs=100"
 # ----loss: 0.8592 - categorical_accuracy: 0.6889 - val_loss: 2.2219 - val_categorical_accuracy: 0.4577---: epochs:100
 
 
-# loss: 0.1512 - categorical_accuracy: 0.9449 - val_loss: 1.5592 - val_categorical_accuracy: 0.7188 :
-# batch_size:64/epochs :30
-# After drop out loss: 0.4732 - categorical_accuracy: 0.8324 - val_loss: 0.6776 -
-# val_categorical_accuracy: 0.7709
+# training parameters
+BATCH_SIZE = 1024
+EPOCHS = 250
+DROPOUT_RATE = 0.2
+FILTERS = 64
+NB_CLASS = 10
+
 
 def create_model():
     model = Sequential()
-    model.add(Conv2D(64, (3, 3), padding='same', activation=relu, input_shape=(32, 32, 3)))
+    model.add(Conv2D(FILTERS, (3, 3), padding='same', activation=relu, input_shape=(32, 32, 3)))
+    model.add(MaxPool2D(2, 2))
+    model.add(Dropout(DROPOUT_RATE))
+
+    model.add(Conv2D(FILTERS, (3, 3), padding='same', activation=relu))
     model.add(MaxPool2D(2, 2))
     model.add(Dropout(0.1))
 
     model.add(Conv2D(64, (3, 3), padding='same', activation=relu))
     model.add(MaxPool2D(2, 2))
-    model.add(Dropout(0.1))
+    model.add(Dropout(DROPOUT_RATE))
 
-    model.add(Conv2D(64, (3, 3), padding='same', activation=relu))
+    model.add(Conv2D(FILTERS, (3, 3), padding='same', activation=relu))
     model.add(MaxPool2D(2, 2))
-    model.add(Dropout(0.1))
-
-    model.add(Conv2D(64, (3, 3), padding='same', activation=relu))
-    model.add(MaxPool2D(2, 2))
-    model.add(Dropout(0.1))
+    model.add(Dropout(DROPOUT_RATE))
 
     model.add(Flatten())
-    model.add(Dense(10, activation=softmax))
+    model.add(Dense(512, activation=relu))
+    model.add(Dropout(0.5))
+    model.add(Dense(NB_CLASS, activation=softmax))
 
     model.compile(optimizer=Adam(),
                   loss=categorical_crossentropy,
@@ -78,7 +83,7 @@ if __name__ == "__main__":
     print(m.summary())
     print(y_val[4])
 
-    history = m.fit(x_train, y_train, epochs=100, batch_size=64, validation_data=(x_val, y_val))
+    history = m.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_val, y_val))
     # callbacks=[tensor_board_callback])
 
     plt.plot(history.history['categorical_accuracy'], label='categorical_accuracy')
