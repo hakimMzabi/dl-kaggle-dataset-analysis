@@ -1,1 +1,9 @@
-/dataset/cifar-10-python
+.idea/
+dataset/
+__pycache__/
+*.png
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+requirements.txt
+logs/
+src/models/checkpoints/
