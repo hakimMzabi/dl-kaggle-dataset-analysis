@@ -17,7 +17,6 @@ class Helper:
         self.models_responses_folder = self.src_path + "\\models\\responses\\"
         self.checkpoint_folder = self.src_path + "\\checkpoints\\"
 
-
     def get_models_last_filename(self, process_name) -> str:
         """
         Returns the last filename of the models generated returns "No model generated." if there is no file.
@@ -46,7 +45,7 @@ class Helper:
         """
         return self.models_responses_folder + process_name.lower() + "_" + str(num) + ".h5" \
             if os.path.isdir(self.models_responses_folder) \
-            else "Couldn't get a model filename"
+            else process_name + "_1"
 
     def get_models_last_filename_to_generate(self, process_name) -> str:
         """
@@ -63,17 +62,15 @@ class Helper:
         :param process_name: mlp, resnet, rnn...
         :return: the max number of the model (e.g if mlp_42.h5 is the file with the highest id, it returns 43)
         """
-        if os.path.isdir(self.models_responses_folder):
-            max = 0
-            for (dirpath, dirnames, filenames) in os.walk(self.models_responses_folder):
-                for filename in filenames:
-                    if process_name.lower() in filename:
-                        number = int(filename.split(process_name.lower() + "_")[1].split('.')[0])
-                        if number > max:
-                            max = number
-            return max + 1
-        print(f"Error : The directory {self.models_responses_folder} does not exists")
-        exit()
+        self.create_dir(self.models_responses_folder)
+        max = 0
+        for (dirpath, dirnames, filenames) in os.walk(self.models_responses_folder):
+            for filename in filenames:
+                if process_name.lower() in filename:
+                    number = int(filename.split(process_name.lower() + "_")[1].split('.')[0])
+                    if number > max:
+                        max = number
+        return max + 1
 
     def save_model(self, model, process_name):
         """
@@ -191,10 +188,21 @@ class Helper:
         (x_test, y_test) = validation_data
 
         model_name = self.get_models_last_filename(process_name).split("\\")[-1].replace(".h5", "")
-        log_file_path = self.src_path + "\\models\\logs\\" + model_name + ".log"
-        checkpoint_file_path = self.src_path + "\\models\\checkpoints\\" + model_name + ".ckpt"
-        tensorboard_log_dir = self.src_path + "\\models\\logs\\tensorboard_" + model_name + "\\fit\\" + datetime.datetime.now()\
-            .strftime("%Y%m%d-%H%M%S")
+
+        log_file_dir = self.src_path + "\\models\\logs\\"
+        checkpoint_file_dir = self.src_path + "\\models\\checkpoints\\"
+        tensorboard_log_dir = self.src_path + "\\models\\logs\\tensorboard\\fit\\"
+
+        self.create_dir(log_file_dir)
+        self.create_dir(checkpoint_file_dir)
+        self.create_dir(tensorboard_log_dir)
+
+        log_file_path = log_file_dir + model_name + ".log"
+        checkpoint_file_path = checkpoint_file_dir + model_name + ".ckpt"
+        tensorboard_log_current_dir = tensorboard_log_dir + model_name + "_" + datetime.datetime.now() \
+            .strftime("%Y%m%d-%H%M%S") + "\\"
+
+        self.create_dir(tensorboard_log_current_dir)
 
         self.create_file(log_file_path)
         self.create_file(checkpoint_file_path)
@@ -204,7 +212,7 @@ class Helper:
             save_weights_only=True,
             verbose=1
         )
-        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_dir, histogram_freq=1)
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_current_dir, histogram_freq=1)
 
         model.fit(
             x_train,

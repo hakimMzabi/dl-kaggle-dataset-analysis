@@ -7,6 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import cifar10
 from sklearn.decomposition import PCA
+from tensorflow_core.python.keras import Sequential
+from tensorflow_core.python.keras.layers import Dense
+from tensorflow_core.python.keras.losses import sparse_categorical_crossentropy
+from tensorflow_core.python.keras.metrics import sparse_categorical_accuracy
+
+from helper import Helper
 
 
 def show_samples(x_train, y_train):
@@ -89,7 +95,7 @@ def plot_best_case_scenario(colors, legend_labels):
     plt.show()
 
 
-if __name__ == "__main__":
+def linear_functions_tests():
     colors = ['gray', 'rosybrown', 'darksalmon', 'bisque', 'tan', 'gold', 'darkkhaki', 'olivedrab', 'royalblue', 'plum']
     labels = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
@@ -110,3 +116,27 @@ if __name__ == "__main__":
     plot_pca(x_recovered_to_plot, y_to_plot, colors, labels)
 
     plot_best_case_scenario(colors, labels)
+
+
+def create_model():
+    model = Sequential()
+
+    model.add(Dense(128, input_dim=3072))  # 32 * 32 * 3
+
+    model.compile(
+        loss=sparse_categorical_crossentropy,
+        metrics=[sparse_categorical_accuracy]
+    )
+
+    return model
+
+def create_and_train_model():
+    helper = Helper()
+    (x_train, y_train), (x_test, y_test) = helper.get_cifar10_prepared()
+    model = create_model()
+    helper.fit(
+        model, x_train, y_train, batch_size=1024, epochs=100, validation_data=(x_test, y_test), process_name="linear"
+    )
+
+if __name__ == "__main__":
+    create_and_train_model()

@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # Load dataset
     (x_train, y_train), (x_test, y_test) = helper.get_cifar10_prepared()
 
-    model = create_model()
+    model = create_model(optimizer="Adam", dropout_values=[0.1, 0.2], activation=relu)
     helper.save_model(model, "mlp")
     model_loaded = helper.load_model(helper.get_models_last_filename("mlp"))
     model_loaded.summary()

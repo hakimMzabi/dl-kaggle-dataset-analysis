@@ -9,17 +9,17 @@ from tensorflow.keras import datasets
 
 
 def create_model():
-    regressor = Sequential()
-    regressor.add(LSTM(50, return_sequences=True, input_dim=(32 * 32 * 3)))
+    m = Sequential()
+    m.add(LSTM(50, return_sequences=True, input_dim=(32 * 32 * 3)))
     # regressor.add(Dropout(0.2))
-    regressor.add(LSTM(units=50, return_sequences=True))
-    regressor.add(LSTM(50, return_sequences=True))
-    regressor.add(LSTM(50, return_sequences=True))
+    m.add(LSTM(units=50, return_sequences=True))
+    m.add(LSTM(50, return_sequences=True))
+    m.add(LSTM(50, return_sequences=True))
     # couche de sortie
-    regressor.add(Dense(units=10))
-    regressor.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=[sparse_categorical_accuracy])
+    m.add(Dense(units=10))
+    m.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=[sparse_categorical_accuracy])
 
-    return regressor
+    return m
 
 
 if __name__ == "__main__":

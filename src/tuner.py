@@ -127,5 +127,5 @@ if __name__ == "__main__":
         y_train,
         x_test,
         y_test,
-        epochs=100
+        epochs=2
     )

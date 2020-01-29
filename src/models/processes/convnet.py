@@ -11,8 +11,8 @@ from tensorflow.keras.losses import *
 from tensorflow.keras.activations import *
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import *
-from tensorflow.keras import datasets, layers
-from matplotlib import pyplot as plt
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
 
 TEST_NAME = "tf2_convnet_mlp_epochs=100"
 
@@ -61,11 +61,8 @@ def create_model():
 
     return model
 
+
 def create_model_2():
-    from tensorflow.keras import datasets, layers, models
-    import matplotlib.pyplot as plt
-
-
     (x_train, y_train), (x_test, y_test) = datasets.cifar10.load_data()
 
     model = models.Sequential()
@@ -101,8 +98,8 @@ def create_model_2():
 
     print(test_acc)
 
-def create_model_3():
 
+def create_model_3():
     (x_train, y_train), (x_val, y_val) = datasets.cifar10.load_data()
     model = Sequential()
     model.add(Conv2D(32, (3, 3), padding='same', activation=relu, input_shape=(32, 32, 3)))
