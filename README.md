@@ -33,7 +33,7 @@ jupyter notebook
 You can also directly look for the models generated on this repository to compare the results by launching :
 
 ```
-tools\tb.bat
+python tools\tb.py
 ```
 
 
