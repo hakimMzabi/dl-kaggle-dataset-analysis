@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from .helper import Helper
+from src.helper import Helper
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import tensorflow.keras as keras
@@ -263,8 +263,10 @@ def model_test_1():
 
 
 if __name__ == "__main__":
-    header()
+    # header()
     # model_fit("fashion_mnist")
-    model_fit_2()
-
-    model_test_1()
+    # model_fit_2()
+    # model_test_1()
+    helper = Helper()
+    top_best_models = helper.evaluate_models(10)
+    print(top_best_models)
