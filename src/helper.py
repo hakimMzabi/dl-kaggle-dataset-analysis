@@ -1,8 +1,10 @@
 import os
+import re
 import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+from enum import Enum
 from src.reporter import Reporter
 from tensorflow.keras.datasets import cifar10
 
@@ -11,6 +13,23 @@ class Helper:
     """
     Helper class is here to help the developer debugging machine learning resources and variables and manage processes.
     """
+
+    class Bcolors(Enum):
+        HEADER = '\033[95m'
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        ENDC = '\033[0m'
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+
+    class Logt(Enum):
+        LOSS = "loss"
+        SPARSE_ACC = "sparse_categorical_accuracy"
+        VAL_LOSS = "val_loss"
+        VALL_SPARSE_ACC = "val_sparse_categorical_accuracy"
+        DIGITS = 16
 
     def __init__(self):
         self.src_path = os.path.dirname(os.path.realpath(__file__))
@@ -72,22 +91,22 @@ class Helper:
                         max = number
         return max + 1
 
-    def save_model(self, model, process_name):
+    def save_model(self, model, process_name) -> None:
         """
         Saves the model in the src/models/responses folder, automatically increments from the last model created
         :param model: tensorflow keras model
         :param process_name: mlp, resnet
-        :return: nothing
+        :return: None
         """
         model.save(self.get_models_last_filename_to_generate(process_name))
 
     @staticmethod
-    def show_samples(x_train, y_train):
+    def show_samples(x_train, y_train) -> None:
         """
-        # Show samples of an image dataset
+        Show samples of an image dataset
         :param x_train: features
         :param y_train: labels
-        :return: nothing
+        :return: None
         """
         for i in range(10):
             plt.imshow(x_train[i])
@@ -95,11 +114,11 @@ class Helper:
             plt.show()
 
     @staticmethod
-    def create_dir(path):
+    def create_dir(path) -> None:
         """
         Creates a directory if it doesn't exist and print an error if it is not possible
         :param path: e.g "/random_dir/the_new_dir/
-        :return: nothing
+        :return: None
         """
         try:
             if not os.path.isdir(path):
@@ -111,6 +130,11 @@ class Helper:
 
     @staticmethod
     def list_to_str_semic(list) -> str:
+        """
+        Convert a list to a string separated by semicolons
+        :param list: e.g [0, 1, 2, 3] as a list object
+        :return: [0;1;2;3] as a string
+        """
         res = "["
         for el in list:
             res += str(el) + ";"
@@ -118,7 +142,51 @@ class Helper:
         return res
 
     @staticmethod
-    def debug_dataset_shapes(dataset_name, dataset, terminate=False):
+    def score(acc, val_acc) -> float:
+        p = min(acc, val_acc)
+        g = max(acc, val_acc)
+        return float(10 * p * (1 + (p / g)))
+
+    @staticmethod
+    def last_line(path) -> str:
+        f = open(path)
+        x = f.readlines()[-1]
+        f.close()
+        return x
+
+    def get_mesures(self, el, path) -> tuple:
+        dflt_res = "None"
+        if ".log" in el:
+            last_line = self.last_line(path + el)
+            metrics = last_line.split(';')
+            loss = metrics[0].split("-")[1].split(":")[1].strip()
+            acc = metrics[1].split(':')[1].strip()
+            val_loss = metrics[2].split(':')[1].strip()
+            val_acc = metrics[3].split(':')[1].strip()
+            return loss, acc, val_loss, val_acc
+        return dflt_res, dflt_res, dflt_res, dflt_res
+
+    def evaluate_models(self, n) -> dict:
+        """
+        Evaluates the current models
+        :return: the n better models
+        """
+        path = self.src_path + "\\models\\logs\\"
+        res = {}
+        # model_eval = {}
+        try:
+            els = os.listdir(path)
+            for k, v in enumerate(els):
+                loss, acc, val_loss, val_acc = self.get_mesures(v, path)
+                if loss != "None" and acc != "None" and val_loss != "None" and val_acc != "None":
+                    res[v.strip(".log")] = self.score(float(str(acc)), float(str(val_acc)))
+                    # model_eval[v.strip(".log")] = {"loss": loss, "acc": acc, "val_loss": val_loss, "val_acc": acc}
+        except FileNotFoundError:
+            print(f"Error: Dir {self.Bcolors.FAIL}{path}{self.Bcolors.ENDC} doesn't exists")
+        return {k: v for k, v in reversed(sorted(res.items(), key=lambda item: item[1])[:n])}
+
+    @staticmethod
+    def debug_dataset_shapes(dataset_name, dataset, terminate=False) -> None:
         """
         Show dataset shapes
         Dataset must be equal to [x_train, y_train, x_test, y_test]
@@ -152,11 +220,11 @@ class Helper:
         return (x_train, y_train), (x_test, y_test)
 
     @staticmethod
-    def load_model(model_filename=None):
+    def load_model(model_filename=None) -> object:
         """
         Returns a tensorflow keras model from the filename
         :param model_filename
-        :return: a tensorflow keras model
+        :return: a tensorflow keras model instance
         """
         try:
             return tf.keras.models.load_model(model_filename)
@@ -164,12 +232,16 @@ class Helper:
             print("Error: Couldn't load the model. Check if the file exists.")
 
     @staticmethod
-    def create_file(path):
-        print(path)
+    def create_file(path) -> None:
+        """
+        Create a file from path, directory must exists or file won't be created
+        :param path: e.g folder1\\folder2\\file.txt
+        :return: None
+        """
         f = open(f"{path}", "w")
         f.close()
 
-    def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name):
+    def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name) -> None:
         """
         Fit a model and adds a checkpoint to avoid losing data in case of failure.
         Checkpoint is also useful in case of overfitting
@@ -180,7 +252,7 @@ class Helper:
         :param epochs:
         :param validation_data: test features and test labels
         :param process_name: mlp, convnet, resnet...
-        :return: nothing
+        :return: None
         """
 
         self.save_model(model, process_name)

@@ -14,20 +14,35 @@ Although we'll try to comment and precise every function and script in our files
 
 ### Quick Start
 
+If this is the first time running this repository, launch:
+
+```
+python tools\create_new_environment.py
+```
+
+#### Jupyter notebooks
+
+After that, you can directly look for the notebooks, by launching
+
+```
+jupyter notebook
+```
+
+#### Tensorboard
+
+You can also directly look for the models generated on this repository to compare the results by launching :
+
+```
+tools\tb.bat
+```
 
 
 ### Tools
 
-#### Create a new Anaconda environment
+If you want to refresh the `requirements.txt` file with your current Anaconda environment packages, you can launch :
 
-```batch script
-py tools/create_new_environment.py
 ```
-
-#### Refresh environment packages
-
-```batch script
-py tools/refresh_requirements.py
+python tools\refresh_requirements.py
 ```
 
 #### Authors
