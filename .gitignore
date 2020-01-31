@@ -7,3 +7,4 @@ __pycache__/
 requirements.txt
 logs/
 src/models/checkpoints/
+notebooks/model.png
