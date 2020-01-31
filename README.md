@@ -25,6 +25,7 @@ python tools\create_new_environment.py
 After that, you can directly look for the notebooks, by launching
 
 ```
+cd notebooks
 jupyter notebook
 ```
 
