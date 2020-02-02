@@ -182,7 +182,7 @@ class Helper:
                     res[v.strip(".log")] = self.score(float(str(acc)), float(str(val_acc)))
                     # model_eval[v.strip(".log")] = {"loss": loss, "acc": acc, "val_loss": val_loss, "val_acc": acc}
         except FileNotFoundError:
-            print(f"Error: Dir {self.Bcolors.FAIL}{path}{self.Bcolors.ENDC} doesn't exists")
+            print(f"Couldn't evaluate model since there is no logs in `{path}`")
         return {k: v for k, v in reversed(sorted(res.items(), key=lambda item: item[1])[:n])}
 
     @staticmethod
@@ -204,7 +204,7 @@ class Helper:
             exit()
 
     @staticmethod
-    def get_cifar10_prepared() -> (tuple, tuple):
+    def get_cifar10_prepared(dim=1) -> (tuple, tuple):
         """
         Returns the cifar10 dataset normalized and well shaped for training as 2 tuples of 4 tensors
         :return: (tuple1 : 2 training tensors of features and labels, tuple2 : 2 validation tensors of
@@ -215,8 +215,12 @@ class Helper:
         x_train = x_train / 255.0
         x_test = x_test / 255.0
         # Reshape the data for training
-        x_train = x_train.reshape((50000, 32 * 32 * 3))
-        x_test = x_test.reshape((10000, 32 * 32 * 3))
+        if dim == 1:
+            x_train = x_train.reshape((50000, 32 * 32 * 3))
+            x_test = x_test.reshape((10000, 32 * 32 * 3))
+        elif dim == 3:
+            x_train = x_train.reshape((50000, 32, 32, 3))
+            x_test = x_test.reshape((10000, 32, 32, 3))
         return (x_train, y_train), (x_test, y_test)
 
     @staticmethod
