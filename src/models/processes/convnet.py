@@ -72,6 +72,11 @@ if __name__ == "__main__":
     model.build()
     model.summary()
     cifar10.helper.fit(
-        model, cifar10.x_train, cifar10.y_train, 1024, 100, validation_data=(cifar10.x_test, cifar10.y_test),
+        model,
+        cifar10.x_train,
+        cifar10.y_train,
+        1024,
+        100,
+        validation_data=(cifar10.x_test, cifar10.y_test),
         process_name="convnet"
     )
