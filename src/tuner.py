@@ -15,7 +15,10 @@ class Tuner:
             dropout_values,
             optimizers,
             activation_functions,
-            batch_sizes
+            batch_sizes,
+            filter_size,
+            padding_values,
+            kernel_sizes
     ):
         self.process_name = process_name
         self.dropouts = dropouts
@@ -23,20 +26,38 @@ class Tuner:
         self.optimizers = optimizers
         self.activation_functions = activation_functions
         self.batch_sizes = batch_sizes
+        if process_name.lower() == "convnet":
+            self.filter_size = filter_size
+            self.padding_values = padding_values
+            self.kernel_sizes = kernel_sizes
         self.helper = Helper()
 
+    def mlp_write(self, scenario_file, dropout, optimizer, activation_function, batch_size):
+        # TODO FINISH METHOD
+        pass
+
+    def convnet_write(self):
+        # TODO FINISH METHOD and add args
+        pass
+
     def write_in_scenario(self, scenario_file, dropout, optimizer, activation_function, batch_size):
-        if dropout == "DropoutDescending":
-            scenario_file.write(f"{dropout}{self.helper.list_to_str_semic(self.dropout_values)},"
-                                f"{optimizer},{activation_function},{batch_size}\n")
-        elif dropout == "DropoutConstant":
-            for dropout_value in self.dropout_values:
+        if self.process_name == "mlp":
+            # TODO REPLACE  mlp_write(args..)
+            if dropout == "DropoutDescending":
+                scenario_file.write(f"{dropout}{self.helper.list_to_str_semic(self.dropout_values)},"
+                                    f"{optimizer},{activation_function},{batch_size}\n")
+            elif dropout == "DropoutConstant":
+                for dropout_value in self.dropout_values:
+                    scenario_file.write(
+                        f"{dropout}[{(str(dropout_value) + ';') * len(self.dropout_values)}],"
+                        f"{optimizer},{activation_function},{batch_size}\n")
+            else:
                 scenario_file.write(
-                    f"{dropout}[{(str(dropout_value) + ';') * len(self.dropout_values)}],"
-                    f"{optimizer},{activation_function},{batch_size}\n")
-        else:
-            scenario_file.write(
-                f"{dropout},{optimizer},{activation_function},{batch_size}\n")
+                    f"{dropout},{optimizer},{activation_function},{batch_size}\n")
+        elif self.process_name == "convnet":
+            # TODO REPLACE  convnet_write(args..)
+            pass
+
 
     def create_scenario(self, scenario_name):
         self.helper.create_dir(self.helper.src_path + "\\scenarios")
@@ -113,9 +134,10 @@ if __name__ == "__main__":
         dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
         dropout_values=[0.2, 0.1],
         optimizers=["SGD", "Adam", "Adamax"],
-        activation_functions=["tanh", "relu", "sigmoid", "softmax"],
+        activation_functions=["tanh", "relu", "sigmoid"],
         batch_sizes=[32, 64, 128, 256]
     )
+
     # Load dataset
     (x_train, y_train), (x_test, y_test) = mlp_tuner.helper.get_cifar10_prepared()
 
@@ -127,5 +149,36 @@ if __name__ == "__main__":
         y_train,
         x_test,
         y_test,
-        epochs=2
+        epochs=100
+    )
+
+    # Create tuner
+    # model = create_model(
+    #     "Adam",
+    #     dropout_values=[0.5, 0.5, 0.5, 0.5],
+    #     activation=relu,
+    #     filter_size=64,
+    #     padding_values="same",
+    #     kernel_size=(3, 3),
+    #     max_pool_values=[
+    #         [2, 2],
+    #         [2, 2],
+    #         [2, 2],
+    #         [2, 2]
+    #     ]
+    # )
+
+    convnet_tuner = Tuner(
+        "convnet",
+        dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
+        dropout_values=[0.5, 0.4, 0.3],
+        activation_functions=["tanh", "relu", "sigmoid"],
+        batch_sizes=[32, 64, 128, 256],
+        filter_size=64,
+        padding_values=["same", "valid"],
+        kernel_sizes=[
+            (3, 3),
+            (4, 4),
+            (5, 5)
+        ]
     )

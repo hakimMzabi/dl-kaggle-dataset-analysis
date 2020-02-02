@@ -1,6 +1,6 @@
-'''
+"""
 ConvNet process to generate models for the CIFAR-10 dataset.
-'''
+"""
 
 import numpy as np
 import tensorflow as tf
