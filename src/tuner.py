@@ -4,32 +4,35 @@ The number of epochs for each scenarios is equal to 100.
 """
 import os
 import importlib
+
+from src.cifar10 import Cifar10
 from src.helper import Helper
 
 
 class Tuner:
     def __init__(
             self,
-            process_name,
-            dropouts,
-            dropout_values,
-            optimizers,
-            activation_functions,
-            batch_sizes,
-            filter_size,
-            padding_values,
-            kernel_sizes
+            process_name=None,
+            dropouts=None,
+            dropout_values=None,
+            optimizers=None,
+            activation_functions=None,
+            batch_sizes=None,
+            filter_size=None,
+            padding_values=None,
+            kernel_sizes=None
     ):
-        self.process_name = process_name
-        self.dropouts = dropouts
-        self.dropout_values = dropout_values
-        self.optimizers = optimizers
-        self.activation_functions = activation_functions
-        self.batch_sizes = batch_sizes
-        if process_name.lower() == "convnet":
-            self.filter_size = filter_size
-            self.padding_values = padding_values
-            self.kernel_sizes = kernel_sizes
+        if process_name is not None:
+            self.process_name = process_name
+            self.dropouts = dropouts
+            self.dropout_values = dropout_values
+            self.optimizers = optimizers
+            self.activation_functions = activation_functions
+            self.batch_sizes = batch_sizes
+            if process_name.lower() == "convnet":
+                self.filter_size = filter_size
+                self.padding_values = padding_values
+                self.kernel_sizes = kernel_sizes
         self.helper = Helper()
 
     def mlp_write(self, scenario_file, dropout, optimizer, activation_function, batch_size):
@@ -127,7 +130,7 @@ class Tuner:
         scenario_file.close()
 
 
-if __name__ == "__main__":
+def mlp_tuner():
     # Create tuner
     mlp_tuner = Tuner(
         "mlp",
@@ -139,35 +142,13 @@ if __name__ == "__main__":
     )
 
     # Load dataset
-    (x_train, y_train), (x_test, y_test) = mlp_tuner.helper.get_cifar10_prepared()
+    cifar10 = Cifar10(dim=3)
+    # (x_train, y_train), (x_test, y_test) = mlp_tuner.helper.get_cifar10_prepared()
 
     mlp_tuner.create_scenario("scenario_1")
-    mlp_tuner.launch_scenario(
-        "mlp",
-        "scenario_1",
-        x_train,
-        y_train,
-        x_test,
-        y_test,
-        epochs=100
-    )
 
+def convnet_tuner():
     # Create tuner
-    # model = create_model(
-    #     "Adam",
-    #     dropout_values=[0.5, 0.5, 0.5, 0.5],
-    #     activation=relu,
-    #     filter_size=64,
-    #     padding_values="same",
-    #     kernel_size=(3, 3),
-    #     max_pool_values=[
-    #         [2, 2],
-    #         [2, 2],
-    #         [2, 2],
-    #         [2, 2]
-    #     ]
-    # )
-
     convnet_tuner = Tuner(
         "convnet",
         dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
@@ -182,3 +163,19 @@ if __name__ == "__main__":
             (5, 5)
         ]
     )
+
+def mlp_scenario_launcher():
+    cifar10 = Cifar10(dim=1)
+    tuner = Tuner()
+    tuner.launch_scenario(
+        "mlp",
+        "scenario_1",
+        cifar10.x_train,
+        cifar10.y_train,
+        cifar10.x_test,
+        cifar10.y_test,
+        epochs=100
+    )
+
+if __name__ == "__main__":
+    mlp_scenario_launcher()
