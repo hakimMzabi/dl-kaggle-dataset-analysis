@@ -39,9 +39,9 @@ class Tuner:
                 f"{dropout},{optimizer},{activation_function},{batch_size}\n")
 
     def create_scenario(self, scenario_name):
-        self.helper.create_dir("./scenarios")
-        self.helper.create_dir("./scenarios/" + self.process_name)
-        scenario_file_path = "./scenarios/" + self.process_name + "/" + scenario_name + ".csv"
+        self.helper.create_dir(self.helper.src_path + "\\scenarios")
+        self.helper.create_dir(self.helper.src_path + "\\scenarios\\" + self.process_name)
+        scenario_file_path = self.helper.src_path + "\\scenarios\\" + self.process_name + "\\" + scenario_name + ".csv"
         try:
             scenario_file = open(scenario_file_path, "w")
             for dropout in self.dropouts:
@@ -78,7 +78,7 @@ class Tuner:
             y_test,
             epochs
     ):
-        scenario_file_path = "./scenarios/" + process_name + "/" + scenario_name + ".csv"
+        scenario_file_path = self.helper.src_path + "\\scenarios\\" + process_name + "\\" + scenario_name + ".csv"
         scenario_file = open(scenario_file_path, "r")
         process = importlib.import_module("src.models.processes." + process_name)
         for line in scenario_file:
