@@ -25,8 +25,12 @@ python tools\create_new_environment.py
 After that, you can directly look for the notebooks, by launching
 
 ```
+cd notebooks
 jupyter notebook
 ```
+
+
+### Tools
 
 #### Tensorboard
 
@@ -36,14 +40,33 @@ You can also directly look for the models generated on this repository to compar
 python tools\tb.py
 ```
 
-
-### Tools
+#### Requirements
 
 If you want to refresh the `requirements.txt` file with your current Anaconda environment packages, you can launch :
 
 ```
 python tools\refresh_requirements.py
 ```
+
+#### Purge checkpoints
+
+If you want to purge the checkpoints folder, you can launch:
+
+```
+python tools\purge_checkpoints.py
+```
+
+#### Purge model
+
+If you want to purge a model , you can launch:
+
+```
+python tools\purge_model.py [model_name]
+```
+
+`[model_name]` in this case can be `mlp_100` for example.
+So if we `launch python tools\purge_model.py mlp_100` it will delete all files related to the `mlp_100` model.
+
 
 #### Authors
 

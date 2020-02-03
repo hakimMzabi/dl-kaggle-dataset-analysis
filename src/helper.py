@@ -3,8 +3,12 @@ import re
 import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import shutil
+import glob
+import multiprocessing
 
 from enum import Enum
+from pathlib import Path
 from src.reporter import Reporter
 from tensorflow.keras.datasets import cifar10
 
@@ -182,7 +186,7 @@ class Helper:
                     res[v.strip(".log")] = self.score(float(str(acc)), float(str(val_acc)))
                     # model_eval[v.strip(".log")] = {"loss": loss, "acc": acc, "val_loss": val_loss, "val_acc": acc}
         except FileNotFoundError:
-            print(f"Error: Dir {self.Bcolors.FAIL}{path}{self.Bcolors.ENDC} doesn't exists")
+            print(f"Couldn't evaluate model since there is no logs in `{path}`")
         return {k: v for k, v in reversed(sorted(res.items(), key=lambda item: item[1])[:n])}
 
     @staticmethod
@@ -204,7 +208,7 @@ class Helper:
             exit()
 
     @staticmethod
-    def get_cifar10_prepared() -> (tuple, tuple):
+    def get_cifar10_prepared(dim=1) -> (tuple, tuple):
         """
         Returns the cifar10 dataset normalized and well shaped for training as 2 tuples of 4 tensors
         :return: (tuple1 : 2 training tensors of features and labels, tuple2 : 2 validation tensors of
@@ -215,8 +219,12 @@ class Helper:
         x_train = x_train / 255.0
         x_test = x_test / 255.0
         # Reshape the data for training
-        x_train = x_train.reshape((50000, 32 * 32 * 3))
-        x_test = x_test.reshape((10000, 32 * 32 * 3))
+        if dim == 1:
+            x_train = x_train.reshape((50000, 32 * 32 * 3))
+            x_test = x_test.reshape((10000, 32 * 32 * 3))
+        elif dim == 3:
+            x_train = x_train.reshape((50000, 32, 32, 3))
+            x_test = x_test.reshape((10000, 32, 32, 3))
         return (x_train, y_train), (x_test, y_test)
 
     @staticmethod
@@ -231,6 +239,10 @@ class Helper:
         except FileNotFoundError:
             print("Error: Couldn't load the model. Check if the file exists.")
 
+    def load_model(self, name, id):
+        savepath = f"{self.src_path}\\models\\responses\\{name}_{id}.h5"
+        return tf.keras.models.load_model(savepath)
+
     @staticmethod
     def create_file(path) -> None:
         """
@@ -241,7 +253,28 @@ class Helper:
         f = open(f"{path}", "w")
         f.close()
 
-    def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name) -> None:
+    def purge(self, model_name=None, ckpt=False):
+        if ckpt:
+            try:
+                shutil.rmtree(f"{self.src_path}\\models\\checkpoints\\")
+            except Exception:
+                pass
+        if model_name is not None:
+            log_model = f"{self.src_path}\\models\\logs\\{model_name}.log"
+            save_model = f"{self.src_path}\\models\\responses\\{model_name}.h5"
+            tensorboard_dir = f"{self.src_path}\\models\\logs\\tensorboard\\fit\\"
+
+            try:
+                os.remove(log_model)
+                os.remove(save_model)
+                for f in os.listdir(tensorboard_dir):
+                    if model_name in f:
+                        shutil.rmtree(tensorboard_dir + f + "\\")
+            except Exception:
+                pass
+
+    def fit(self, model, x_train, y_train, batch_size, epochs, validation_data, process_name,
+            hp_log_title=None) -> None:
         """
         Fit a model and adds a checkpoint to avoid losing data in case of failure.
         Checkpoint is also useful in case of overfitting
@@ -293,7 +326,7 @@ class Helper:
             epochs=epochs,
             validation_data=(x_test, y_test),
             callbacks=[
-                Reporter(x_train, y_train, batch_size, model_name, log_file_path),
+                Reporter(x_train, y_train, batch_size, model_name, log_file_path, hp_log_title=hp_log_title),
                 cp_callback,
                 tensorboard_callback
             ]
