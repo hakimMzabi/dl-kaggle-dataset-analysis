@@ -9,6 +9,9 @@ from tensorflow.keras.optimizers import *
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.utils import plot_model
 
+# 47s 940us/sample - loss: 0.7791 - accuracy: 0.7284 - val_loss: 0.7182 - val_accuracy: 0.7595 200 epochs BZ:64 DO:0.2
+# 46s 922us/sample - loss: 0.5159 - accuracy: 0.8196 - val_loss: 0.8223 - val_accuracy: 0.7389
+# 47s 935us/sample - loss: 0.3512 - accuracy: 0.8780 - val_loss: 0.9876 - val_accuracy: 0.7350 50epoch BZ:64 DO:0.2
 
 # training parameters
 BATCH_SIZE = 64
@@ -16,6 +19,7 @@ EPOCHS = 50
 DROPOUT_RATE = 0.2
 FILTERS = 64
 NB_CLASS = 10
+SKIP = 3
 
 def Residual_layer(inputs,
                    filters=FILTERS,
@@ -33,13 +37,13 @@ def Residual_layer(inputs,
     x = inputs
     if conf_first:
         x = conv(x)
-        x = Dropout(DROPOUT_RATE)(x)
     else:
         if batch_norm:
             x = BatchNormalization()(x)
             if activation is not None:
                 x = Activation(activation)(x)
             x = conv(x)
+            x = Dropout(DROPOUT_RATE)(x)
     return x
 
 
@@ -53,10 +57,8 @@ def resnet_model(input_shape, depth, num_classes=NB_CLASS):
     for stack in range(3):
         for i in range(num_res_layer):
             strides = 1
-
             if stack > 0 and i ==0:
                 strides = 2
-
             y = Residual_layer(inputs=x,
                                filters=filter,
                                strides=strides)
@@ -73,11 +75,11 @@ def resnet_model(input_shape, depth, num_classes=NB_CLASS):
                                    strides=strides,
                                    activation=None,
                                    batch_norm=False)
-            x = add([x, y], name="add_dense_{i}")
+            x = add([x, y])
             x = Activation(relu)(x)
         filter = filter*2
 
-    x = AveragePooling2D(pool_size=8)(x)
+    x = MaxPool2D(pool_size=8)(x)
     y = Flatten()(x)
 
     output = Dense(num_classes, activation=softmax, kernel_initializer='he_normal', name=f"dense_output")(y)
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     (x_train, y_train), (x_val, y_val) = cifar10.load_data()
 
     input_shape = x_train.shape[1:]
-    depth = 3 * 6 + 2
+    depth = SKIP * 6 + 2
 
     x_train = x_train / 255.0
     x_val = x_val / 255.0
@@ -102,9 +104,9 @@ if __name__ == "__main__":
     m = resnet_model(input_shape, depth)
 
     #Compilation du modèle
-    m.compile(Adam(), loss='sparse_categorical_crossentropy' , metrics=['accuracy'])
+    m.compile(Adam(0.001), loss='sparse_categorical_crossentropy' , metrics=['accuracy'])
     print(m.summary())
-    plot_model(m, "../test_mlp_with_skip_connections.png")
+    plot_model(m, "../../Resnet_model.png")
 
     m.fit(x_train, y_train
           , validation_data=(x_val, y_val)

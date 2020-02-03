@@ -13,10 +13,14 @@ from matplotlib import pyplot as plt
 TEST_NAME = "tf2_convnet_mlp_epochs=100"
 
 # ---3s 66us/sample - loss: 0.3325 - categorical_accuracy: 0.8829 - val_loss: 0.5924 - val_categorical_accuracy: 0.8178 BEST
+# epochs 250 ; batch size 1024
+
 # -----loss: 0.3161 - categorical_accuracy: 0.8874 - val_loss: 0.7152 - val_categorical_accuracy: 0.7836
 # 10000/1 - 1s - loss: 0.4760 - categorical_accuracy: 0.7836 : epochs 100; batch size : 64
+
 # ------loss: 0.0186 - categorical_accuracy: 0.8458 - val_loss: 0.0804 - val_categorical_accuracy: 0.7406---------- :
 # activation 4 Relu / softmax; opt:Adam/ loss: categorical_accuracy epochs 100, batch size: 2048#
+
 # ----loss: 0.8592 - categorical_accuracy: 0.6889 - val_loss: 2.2219 - val_categorical_accuracy: 0.4577---: epochs:100
 
 
@@ -29,6 +33,7 @@ NB_CLASS = 10
 
 
 def create_model():
+
     model = Sequential()
     model.add(Conv2D(FILTERS, (3, 3), padding='same', activation=relu, input_shape=(32, 32, 3)))
     model.add(MaxPool2D(2, 2))
@@ -77,14 +82,17 @@ if __name__ == "__main__":
     print(x_train.shape)
     print(x_val.shape)
 
-    # tensor_board_callback = TensorBoard("./logs/" + TEST_NAME)
+    tensor_board_callback = TensorBoard("./logs/" + TEST_NAME)
 
     m = create_model()
     print(m.summary())
     print(y_val[4])
 
-    history = m.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_val, y_val))
-    # callbacks=[tensor_board_callback])
+    history = m.fit(x_train, y_train
+                    , epochs=EPOCHS
+                    ,batch_size=BATCH_SIZE
+                    , validation_data=(x_val, y_val)
+                    , callbacks=tensor_board_callback)
 
     plt.plot(history.history['categorical_accuracy'], label='categorical_accuracy')
     plt.plot(history.history['val_categorical_accuracy'], label='val_categorical_accuracy')
