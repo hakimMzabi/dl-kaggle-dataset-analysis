@@ -1,0 +1,3 @@
+=====mlp_5=====
+Epoch 1 - loss: 1.9938325393295289 ; sparse_categorical_accuracy : 0.290800005197525 ; val_loss : 1.8973158012390137 ; val_sparse_categorical_accuracy : 0.3249000012874603
+Epoch 2 - loss: 1.825458416519165 ; sparse_categorical_accuracy : 0.35947999358177185 ; val_loss : 1.7920785892486573 ; val_sparse_categorical_accuracy : 0.36399999260902405
