@@ -274,4 +274,4 @@ if __name__ == "__main__":
     # tuner.show_model("mlp", 6)
     model_loaded = helper.load_model("mlp", 109)
     model_loaded.summary()
-    tuner.resume_mlp_scenario(110)
+    tuner.resume_mlp_scenario(109)
