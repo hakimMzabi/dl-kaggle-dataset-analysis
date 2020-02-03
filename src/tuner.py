@@ -120,12 +120,21 @@ class Tuner:
             y_train,
             x_test,
             y_test,
-            epochs
+            epochs,
+            resume_at=None
     ):
         scenario_file_path = self.helper.src_path + "\\scenarios\\" + process_name + "\\" + scenario_name + ".csv"
         scenario_file = open(scenario_file_path, "r")
         process = importlib.import_module("src.models.processes." + process_name)
+        if resume_at is not None:
+            i = 0
         for line in scenario_file:
+            if resume_at is not None:
+                i += 1
+                if i == resume_at:
+                    print(line)
+                    exit()
+                continue
             hp = list(map(str.strip, line.split(",")))
             (dropout, dropout_values) = self.filter_dropout(hp[0])
             optimizer = hp[1]
@@ -167,73 +176,100 @@ class Tuner:
 
         scenario_file.close()
 
+    @staticmethod
+    def mlp_tuner():
+        # Create tuner
+        mlp_tuner = Tuner(
+            "mlp",
+            dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
+            dropout_values=[0.2, 0.1],
+            optimizers=["SGD", "Adam", "Adamax"],
+            activation_functions=["tanh", "relu", "sigmoid"],
+            batch_sizes=[32, 64, 128, 256]
+        )
 
-def mlp_tuner():
-    # Create tuner
-    mlp_tuner = Tuner(
-        "mlp",
-        dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
-        dropout_values=[0.2, 0.1],
-        optimizers=["SGD", "Adam", "Adamax"],
-        activation_functions=["tanh", "relu", "sigmoid"],
-        batch_sizes=[32, 64, 128, 256]
-    )
+        # Create scenario
+        mlp_tuner.create_scenario("scenario_1")
 
-    # Create scenario
-    mlp_tuner.create_scenario("scenario_1")
+    @staticmethod
+    def convnet_tuner():
+        # Create tuner
+        convnet_tuner = Tuner(
+            "convnet",
+            dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
+            dropout_values=[0.5, 0.4, 0.3],
+            activation_functions=["tanh", "relu", "sigmoid"],
+            batch_sizes=[32, 64, 128, 256],
+            filter_size=64,
+            padding_values=["same", "valid"],
+            kernel_sizes=[
+                (3, 3),
+                (4, 4),
+                (5, 5)
+            ],
+            optimizers=["SGD", "Adam", "Adamax"]
+        )
 
+        # Create scenario
+        convnet_tuner.create_scenario("scenario_convnet")
 
-def convnet_tuner():
-    # Create tuner
-    convnet_tuner = Tuner(
-        "convnet",
-        dropouts=["NoDropout", "DropoutDescending", "DropoutConstant"],
-        dropout_values=[0.5, 0.4, 0.3],
-        activation_functions=["tanh", "relu", "sigmoid"],
-        batch_sizes=[32, 64, 128, 256],
-        filter_size=64,
-        padding_values=["same", "valid"],
-        kernel_sizes=[
-            (3, 3),
-            (4, 4),
-            (5, 5)
-        ],
-        optimizers=["SGD", "Adam", "Adamax"]
-    )
+    @staticmethod
+    def mlp_scenario_launcher():
+        cifar10 = Cifar10(dim=1)
+        tuner = Tuner()
+        tuner.launch_scenario(
+            "mlp",
+            "scenario_1",
+            cifar10.x_train,
+            cifar10.y_train,
+            cifar10.x_test,
+            cifar10.y_test,
+            epochs=100
+        )
 
-    # Create scenario
-    convnet_tuner.create_scenario("scenario_convnet")
+    @staticmethod
+    def convnet_scenario_launcher():
+        cifar10 = Cifar10(dim=3)
+        tuner = Tuner()
+        tuner.launch_scenario(
+            "convnet",
+            "scenario_convnet",
+            cifar10.x_train,
+            cifar10.y_train,
+            cifar10.x_test,
+            cifar10.y_test,
+            epochs=2
+        )
 
+    def show_model(self, name, id):
+        model_log_file = f"{self.helper.src_path}\\models\\logs\\{name}_{id}.log"
+        f = open(model_log_file, "r")
+        for line in f:
+            print(line, end="")
+        f.close()
 
-def mlp_scenario_launcher():
-    cifar10 = Cifar10(dim=1)
-    tuner = Tuner()
-    tuner.launch_scenario(
-        "mlp",
-        "scenario_1",
-        cifar10.x_train,
-        cifar10.y_train,
-        cifar10.x_test,
-        cifar10.y_test,
-        epochs=100
-    )
-
-
-def convnet_scenario_launcher():
-    cifar10 = Cifar10(dim=3)
-    tuner = Tuner()
-    tuner.launch_scenario(
-        "convnet",
-        "scenario_convnet",
-        cifar10.x_train,
-        cifar10.y_train,
-        cifar10.x_test,
-        cifar10.y_test,
-        epochs=2
-    )
+    @staticmethod
+    def resume_mlp_scenario(n_line):
+        cifar10 = Cifar10(dim=3)
+        tuner = Tuner()
+        tuner.launch_scenario(
+            "mlp",
+            "scenario_1",
+            cifar10.x_train,
+            cifar10.y_train,
+            cifar10.x_test,
+            cifar10.y_test,
+            epochs=4,
+            resume_at=n_line
+        )
 
 
 if __name__ == "__main__":
-    # mlp_scenario_launcher()
-    # convnet_tuner()
-    convnet_scenario_launcher()
+    tuner = Tuner()
+    helper = Helper()
+    # tuner.mlp_scenario_launcher()
+    # tuner.convnet_tuner()
+    # tuner.convnet_scenario_launcher()
+    # tuner.show_model("mlp", 6)
+    helper.load_model("mlp", 6)
+    # tuner.resume_mlp_scenario(109)

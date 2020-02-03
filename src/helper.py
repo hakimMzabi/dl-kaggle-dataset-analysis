@@ -235,6 +235,10 @@ class Helper:
         except FileNotFoundError:
             print("Error: Couldn't load the model. Check if the file exists.")
 
+    def load_model(self, name, id):
+        savepath = f"{self.src_path}\\models\\responses\\{name}_{id}.h5"
+        return tf.keras.models.load_model(savepath)
+
     @staticmethod
     def create_file(path) -> None:
         """
