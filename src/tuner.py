@@ -71,6 +71,15 @@ class Tuner:
             self.convnet_write(scenario_file, dropout, optimizer, activation_function, batch_size, filter_size,
                                padding_value, kernel_size)
 
+    def inspect_scenario(self, scenario_name):
+        scenario_file_path = self.helper.src_path + "\\scenarios\\" + self.process_name + "\\" + scenario_name + ".csv"
+        try:
+            scenario_file = open(scenario_file_path, "r")
+            for line in scenario_file:
+                print(line, end="")
+        except FileNotFoundError:
+            print(f"Couldn't open {scenario_file_path}")
+
     def create_scenario(self, scenario_name):
         self.helper.create_dir(self.helper.src_path + "\\scenarios")
         self.helper.create_dir(self.helper.src_path + "\\scenarios\\" + self.process_name)
@@ -133,7 +142,7 @@ class Tuner:
                     optimizer=optimizer,
                     dropout_values=dropout_values,
                     activation=activation_function,
-                    filter_size=filter_size,
+                    filters=filter_size,
                     padding_value=padding_value,
                     kernel_size=kernel_size
                 )

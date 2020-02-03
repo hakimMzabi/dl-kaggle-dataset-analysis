@@ -14,16 +14,16 @@ def create_model(
         optimizer="Adam",
         dropout_values=None,
         activation=relu,
-        filter_size=64,
+        filters=64,
         padding_value="same",
         kernel_size=(3, 3)
 ):
     model = Sequential()
 
-    model.add(Conv2D(filter_size, kernel_size, padding=padding_value, activation=activation,
+    model.add(Conv2D(filters, kernel_size, padding=padding_value, activation=activation,
                      input_shape=(32, 32, 3)))
     for i in range(3):
-        model.add(Conv2D(filter_size, kernel_size, padding=padding_value, activation=activation))
+        model.add(Conv2D(filters, kernel_size, padding=padding_value, activation=activation))
         model.add(MaxPool2D(2, 2))
         if dropout_values is not None and dropout_values[i] is not None:
             model.add(Dropout(dropout_values[i]))
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         "Adam",
         dropout_values=[0.5, 0.5, 0.5, 0.5],
         activation=relu,
-        filter_size=64,
+        filters=64,
         padding_value="same",
         kernel_size=(3, 3)
     )
