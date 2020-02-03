@@ -126,15 +126,15 @@ class Tuner:
         scenario_file_path = self.helper.src_path + "\\scenarios\\" + process_name + "\\" + scenario_name + ".csv"
         scenario_file = open(scenario_file_path, "r")
         process = importlib.import_module("src.models.processes." + process_name)
-        if resume_at is not None:
-            i = 0
+
+        i = 0 if resume_at is not None else None
         for line in scenario_file:
-            if resume_at is not None:
+            if resume_at is not None and i <= resume_at:
                 i += 1
                 if i == resume_at:
-                    print(line)
-                    exit()
-                continue
+                    print(f"Resuming the scenario at line {i} ({line})")
+                elif i < resume_at:
+                    continue
             hp = list(map(str.strip, line.split(",")))
             (dropout, dropout_values) = self.filter_dropout(hp[0])
             optimizer = hp[1]
@@ -163,6 +163,7 @@ class Tuner:
                 )
             else:
                 raise ValueError("Model tuning for this process is not possible")
+
             model.summary()
             self.helper.fit(
                 model,
@@ -271,5 +272,6 @@ if __name__ == "__main__":
     # tuner.convnet_tuner()
     # tuner.convnet_scenario_launcher()
     # tuner.show_model("mlp", 6)
-    helper.load_model("mlp", 6)
-    # tuner.resume_mlp_scenario(109)
+    model_loaded = helper.load_model("mlp", 109)
+    model_loaded.summary()
+    tuner.resume_mlp_scenario(110)
