@@ -251,7 +251,7 @@ class Tuner:
 
     @staticmethod
     def resume_mlp_scenario(n_line):
-        cifar10 = Cifar10(dim=3)
+        cifar10 = Cifar10(dim=1)
         tuner = Tuner()
         tuner.launch_scenario(
             "mlp",
@@ -260,7 +260,7 @@ class Tuner:
             cifar10.y_train,
             cifar10.x_test,
             cifar10.y_test,
-            epochs=4,
+            epochs=100,
             resume_at=n_line
         )
 
