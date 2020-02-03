@@ -29,6 +29,9 @@ cd notebooks
 jupyter notebook
 ```
 
+
+### Tools
+
 #### Tensorboard
 
 You can also directly look for the models generated on this repository to compare the results by launching :
@@ -37,14 +40,22 @@ You can also directly look for the models generated on this repository to compar
 python tools\tb.py
 ```
 
-
-### Tools
+#### Requirements
 
 If you want to refresh the `requirements.txt` file with your current Anaconda environment packages, you can launch :
 
 ```
 python tools\refresh_requirements.py
 ```
+
+#### Purge checkpoints
+
+If you want to purge the checkpoints folder, you can launch:
+
+```
+python tools\purge_checkpoints.py
+```
+
 
 #### Authors
 
