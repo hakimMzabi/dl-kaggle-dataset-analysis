@@ -12,7 +12,7 @@ from tensorflow_core.python.keras.layers import Dense
 from tensorflow_core.python.keras.losses import sparse_categorical_crossentropy
 from tensorflow_core.python.keras.metrics import sparse_categorical_accuracy
 
-from helper import Helper
+from src.helper import Helper
 
 
 def show_samples(x_train, y_train):

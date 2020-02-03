@@ -1,10 +1,7 @@
 .idea/
-dataset/
 __pycache__/
 *.png
 .ipynb_checkpoints/
 *-checkpoint.ipynb
 requirements.txt
-logs/
-src/models/checkpoints/
 notebooks/model.png
