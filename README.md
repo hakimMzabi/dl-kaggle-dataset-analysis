@@ -56,6 +56,17 @@ If you want to purge the checkpoints folder, you can launch:
 python tools\purge_checkpoints.py
 ```
 
+#### Purge model
+
+If you want to purge a model , you can launch:
+
+```
+python tools\purge_model.py [model_name]
+```
+
+`[model_name]` in this case can be `mlp_100` for example.
+So if we `launch python tools\purge_model.py mlp_100` it will delete all files related to the `mlp_100` model.
+
 
 #### Authors
 
