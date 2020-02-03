@@ -272,6 +272,6 @@ if __name__ == "__main__":
     # tuner.convnet_tuner()
     # tuner.convnet_scenario_launcher()
     # tuner.show_model("mlp", 6)
-    model_loaded = helper.load_model("mlp", 109)
-    model_loaded.summary()
+    # model_loaded = helper.load_model("mlp", 109)
+    # model_loaded.summary()
     tuner.resume_mlp_scenario(109)
