@@ -172,7 +172,8 @@ class Tuner:
                 batch_size=batch_size,
                 epochs=epochs,
                 validation_data=(x_test, y_test),
-                process_name=process_name
+                process_name=process_name,
+                hp_log_title=line
             )
 
         scenario_file.close()
@@ -250,28 +251,30 @@ class Tuner:
         f.close()
 
     @staticmethod
-    def resume_mlp_scenario(n_line):
-        cifar10 = Cifar10(dim=1)
+    def resume_scenario(process_name, scenario_file_name, epoch, n_line, dim=1):
+        cifar10 = Cifar10(dim=dim)
         tuner = Tuner()
         tuner.launch_scenario(
-            "mlp",
-            "scenario_1",
+            process_name,
+            scenario_file_name,
             cifar10.x_train,
             cifar10.y_train,
             cifar10.x_test,
             cifar10.y_test,
-            epochs=100,
+            epochs=epoch,
             resume_at=n_line
         )
 
 
 if __name__ == "__main__":
-    tuner = Tuner()
-    helper = Helper()
+    # tuner = Tuner()
+    # helper = Helper()
     # tuner.mlp_scenario_launcher()
     # tuner.convnet_tuner()
     # tuner.convnet_scenario_launcher()
     # tuner.show_model("mlp", 6)
     # model_loaded = helper.load_model("mlp", 109)
     # model_loaded.summary()
-    tuner.resume_mlp_scenario(109)
+    # tuner.resume_mlp_scenario(109)
+    tuner = Tuner()
+    tuner.resume_scenario("mlp", "scenario_1", 100, 150, 1)
