@@ -2,7 +2,6 @@
 The Tuner class is here to automatically generate model generation scenarios present in the src/scenarios/ folder
 The number of epochs for each scenarios is equal to 100.
 """
-import os
 import importlib
 
 from src.cifar10 import Cifar10
@@ -36,31 +35,41 @@ class Tuner:
         self.helper = Helper()
 
     def mlp_write(self, scenario_file, dropout, optimizer, activation_function, batch_size):
-        # TODO FINISH METHOD
-        pass
-
-    def convnet_write(self):
-        # TODO FINISH METHOD and add args
-        pass
-
-    def write_in_scenario(self, scenario_file, dropout, optimizer, activation_function, batch_size):
-        if self.process_name == "mlp":
-            # TODO REPLACE  mlp_write(args..)
-            if dropout == "DropoutDescending":
-                scenario_file.write(f"{dropout}{self.helper.list_to_str_semic(self.dropout_values)},"
-                                    f"{optimizer},{activation_function},{batch_size}\n")
-            elif dropout == "DropoutConstant":
-                for dropout_value in self.dropout_values:
-                    scenario_file.write(
-                        f"{dropout}[{(str(dropout_value) + ';') * len(self.dropout_values)}],"
-                        f"{optimizer},{activation_function},{batch_size}\n")
-            else:
+        if dropout == "DropoutDescending":
+            scenario_file.write(f"{dropout}{self.helper.list_to_str_semic(self.dropout_values)},"
+                                f"{optimizer},{activation_function},{batch_size}\n")
+        elif dropout == "DropoutConstant":
+            for dropout_value in self.dropout_values:
                 scenario_file.write(
-                    f"{dropout},{optimizer},{activation_function},{batch_size}\n")
-        elif self.process_name == "convnet":
-            # TODO REPLACE  convnet_write(args..)
-            pass
+                    f"{dropout}[{(str(dropout_value) + ';') * len(self.dropout_values)}],"
+                    f"{optimizer},{activation_function},{batch_size}\n")
+        else:
+            scenario_file.write(
+                f"{dropout},{optimizer},{activation_function},{batch_size}\n")
 
+    def convnet_write(self, scenario_file, dropout, optimizer, activation_function, batch_size, filter_size,
+                      padding_value, kernel_size):
+        if dropout == "DropoutDescending":
+            scenario_file.write(f"{dropout}{self.helper.list_to_str_semic(self.dropout_values)},"
+                                f"{optimizer},{activation_function},{batch_size},"
+                                f"{filter_size},{padding_value},{kernel_size}\n")
+        elif dropout == "DropoutConstant":
+            for dropout_value in self.dropout_values:
+                scenario_file.write(
+                    f"{dropout}[{(str(dropout_value) + ';') * len(self.dropout_values)}],"
+                    f"{optimizer},{activation_function},{batch_size},{filter_size},{padding_value},{kernel_size}\n")
+        else:
+            scenario_file.write(
+                f"{dropout},{optimizer},{activation_function},{batch_size},{filter_size}"
+                f",{padding_value},{kernel_size}\n")
+
+    def write_in_scenario(self, scenario_file, dropout, optimizer, activation_function, batch_size, filter_size=None,
+                          padding_value=None, kernel_size=None):
+        if self.process_name == "mlp":
+            self.mlp_write(scenario_file, dropout, optimizer, activation_function, batch_size)
+        elif self.process_name == "convnet":
+            self.convnet_write(scenario_file, dropout, optimizer, activation_function, batch_size, filter_size,
+                               padding_value, kernel_size)
 
     def create_scenario(self, scenario_name):
         self.helper.create_dir(self.helper.src_path + "\\scenarios")
@@ -72,20 +81,22 @@ class Tuner:
                 for optimizer in self.optimizers:
                     for activation_function in self.activation_functions:
                         for batch_size in self.batch_sizes:
-                            self.write_in_scenario(
-                                scenario_file,
-                                dropout,
-                                optimizer,
-                                activation_function,
-                                batch_size
-                            )
+                            if self.process_name == "convnet":
+                                for padding_value in self.padding_values:
+                                    for kernel_size in self.kernel_sizes:
+                                        self.write_in_scenario(scenario_file, dropout, optimizer, activation_function,
+                                                               batch_size, self.filter_size, padding_value, kernel_size)
+                            else:
+                                self.write_in_scenario(scenario_file, dropout, optimizer, activation_function,
+                                                       batch_size)
             scenario_file.close()
         except ValueError:
             print(f"Error: Could not create a file \"{scenario_file_path}\".")
         else:
             print(f"Successfully created the \"{scenario_file_path}\" file.")
 
-    def filter_dropout(self, dropout_str):
+    @staticmethod
+    def filter_dropout(dropout_str):
         if "[" in dropout_str:
             (dropout_type, dropout_values) = dropout_str.split("[")
             dropout_values = dropout_values.replace("]", "").split(";")[:-1]
@@ -111,11 +122,29 @@ class Tuner:
             optimizer = hp[1]
             activation_function = hp[2]
             batch_size = int(hp[3])
-            model = process.create_model(
-                optimizer=optimizer,
-                dropout_values=dropout_values,
-                activation=activation_function,
-            )
+            if process_name == "convnet":
+                filter_size = int(hp[4])
+                padding_value = hp[5]
+                ksv_1, ksv_2 = int(hp[6].strip().replace("(", "")), int(
+                    hp[7].strip().replace(")",
+                                          ""))
+                kernel_size = (ksv_1, ksv_2)
+                model = process.create_model(
+                    optimizer=optimizer,
+                    dropout_values=dropout_values,
+                    activation=activation_function,
+                    filter_size=filter_size,
+                    padding_value=padding_value,
+                    kernel_size=kernel_size
+                )
+            elif process_name == "mlp":
+                model = process.create_model(
+                    optimizer=optimizer,
+                    dropout_values=dropout_values,
+                    activation=activation_function,
+                )
+            else:
+                raise ValueError("Model tuning for this process is not possible")
             model.summary()
             self.helper.fit(
                 model,
@@ -141,11 +170,9 @@ def mlp_tuner():
         batch_sizes=[32, 64, 128, 256]
     )
 
-    # Load dataset
-    cifar10 = Cifar10(dim=3)
-    # (x_train, y_train), (x_test, y_test) = mlp_tuner.helper.get_cifar10_prepared()
-
+    # Create scenario
     mlp_tuner.create_scenario("scenario_1")
+
 
 def convnet_tuner():
     # Create tuner
@@ -161,8 +188,13 @@ def convnet_tuner():
             (3, 3),
             (4, 4),
             (5, 5)
-        ]
+        ],
+        optimizers=["SGD", "Adam", "Adamax"]
     )
+
+    # Create scenario
+    convnet_tuner.create_scenario("scenario_convnet")
+
 
 def mlp_scenario_launcher():
     cifar10 = Cifar10(dim=1)
@@ -177,5 +209,22 @@ def mlp_scenario_launcher():
         epochs=100
     )
 
+
+def convnet_scenario_launcher():
+    cifar10 = Cifar10(dim=3)
+    tuner = Tuner()
+    tuner.launch_scenario(
+        "convnet",
+        "scenario_convnet",
+        cifar10.x_train,
+        cifar10.y_train,
+        cifar10.x_test,
+        cifar10.y_test,
+        epochs=2
+    )
+
+
 if __name__ == "__main__":
-    mlp_scenario_launcher()
+    # mlp_scenario_launcher()
+    # convnet_tuner()
+    convnet_scenario_launcher()
