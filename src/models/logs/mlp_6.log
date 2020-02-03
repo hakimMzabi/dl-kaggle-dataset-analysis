@@ -1,4 +1,5 @@
 =====mlp_6=====
+<<<<<<< HEAD
 Epoch 1 - loss: 2.05616657497406 ; sparse_categorical_accuracy : 0.26914000511169434 ; val_loss : 1.949584425354004 ; val_sparse_categorical_accuracy : 0.31349998712539673
 Epoch 2 - loss: 1.892466891555786 ; sparse_categorical_accuracy : 0.3411000072956085 ; val_loss : 1.8557745189666748 ; val_sparse_categorical_accuracy : 0.35280001163482666
 Epoch 3 - loss: 1.8340551516342163 ; sparse_categorical_accuracy : 0.35885998606681824 ; val_loss : 1.8322408966064454 ; val_sparse_categorical_accuracy : 0.34599998593330383
@@ -99,3 +100,7 @@ Epoch 97 - loss: 1.243844407119751 ; sparse_categorical_accuracy : 0.56370002031
 Epoch 98 - loss: 1.2462557085418702 ; sparse_categorical_accuracy : 0.5623800158500671 ; val_loss : 1.5024100336074828 ; val_sparse_categorical_accuracy : 0.474700003862381
 Epoch 99 - loss: 1.2442912901306151 ; sparse_categorical_accuracy : 0.5631399750709534 ; val_loss : 1.3849114292144775 ; val_sparse_categorical_accuracy : 0.5101000070571899
 Epoch 100 - loss: 1.2420007456207276 ; sparse_categorical_accuracy : 0.5634999871253967 ; val_loss : 1.4460383535385133 ; val_sparse_categorical_accuracy : 0.4884999990463257
+=======
+Epoch 1 - loss: 2.080567981834412 ; sparse_categorical_accuracy : 0.25196000933647156 ; val_loss : 2.006600587463379 ; val_sparse_categorical_accuracy : 0.2662999927997589
+Epoch 2 - loss: 1.9014229547119141 ; sparse_categorical_accuracy : 0.3333800137042999 ; val_loss : 1.8660757164001465 ; val_sparse_categorical_accuracy : 0.3465999960899353
+>>>>>>> 437441f01823603bbf171e9e39bb47e4f37683d6

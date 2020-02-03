@@ -2,17 +2,10 @@
 ConvNet process to generate models for the CIFAR-10 dataset.
 """
 
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras.datasets import *
-from tensorflow.keras.metrics import *
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.losses import *
 from tensorflow.keras.activations import *
 from tensorflow.keras.layers import *
+from tensorflow.keras.metrics import *
 from tensorflow.keras.models import *
-from tensorflow.keras import datasets, layers, models
-import matplotlib.pyplot as plt
 
 from src.cifar10 import Cifar10
 
@@ -21,23 +14,18 @@ def create_model(
         optimizer="Adam",
         dropout_values=None,
         activation=relu,
-        filter_size=64,
-        padding_values="same",
-        kernel_size=(3, 3),
-        max_pool_values=None
+        filters=64,
+        padding_value="same",
+        kernel_size=(3, 3)
 ):
     model = Sequential()
 
-    if len(dropout_values) != len(padding_values):
-        print("Number of dropout values must be equal to number of padding values")
-        return
-
-    for i in range(len(dropout_values)):
-        if i == 0:
-            model.add(Conv2D(filter_size, kernel_size, padding='same', activation=activation, input_shape=(32, 32, 3)))
-        else:
-            model.add(Conv2D(filter_size, kernel_size, padding='same', activation=activation))
-            model.add(MaxPool2D(max_pool_values[i][0], max_pool_values[i][1]))
+    model.add(Conv2D(filters, kernel_size, padding=padding_value, activation=activation,
+                     input_shape=(32, 32, 3)))
+    for i in range(3):
+        model.add(Conv2D(filters, kernel_size, padding=padding_value, activation=activation))
+        model.add(MaxPool2D(2, 2))
+        if dropout_values is not None and dropout_values[i] is not None:
             model.add(Dropout(dropout_values[i]))
 
     model.add(Flatten())
@@ -59,15 +47,9 @@ if __name__ == "__main__":
         "Adam",
         dropout_values=[0.5, 0.5, 0.5, 0.5],
         activation=relu,
-        filter_size=64,
-        padding_values="same",
-        kernel_size=(3, 3),
-        max_pool_values=[
-            [2, 2],
-            [2, 2],
-            [2, 2],
-            [2, 2]
-        ]
+        filters=64,
+        padding_value="same",
+        kernel_size=(3, 3)
     )
     model.build()
     model.summary()
