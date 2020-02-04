@@ -323,7 +323,7 @@ class Helper:
 
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_current_dir, histogram_freq=1)
 
-        earlystop_callback = tf.keras.EarlyStopping(
+        earlystop_callback = tf.keras.callbacks.EarlyStopping(
             monitor="val_sparse_categorical_accuracy", min_delta=0.0001,
             patience=1
         )
