@@ -267,8 +267,8 @@ class Tuner:
 
 
 if __name__ == "__main__":
-    # tuner = Tuner()
-    # helper = Helper()
+    tuner = Tuner()
+    helper = Helper()
     # tuner.mlp_scenario_launcher()
     # tuner.convnet_tuner()
     # tuner.convnet_scenario_launcher()
@@ -276,5 +276,6 @@ if __name__ == "__main__":
     # model_loaded = helper.load_model("mlp", 109)
     # model_loaded.summary()
     # tuner.resume_mlp_scenario(109)
-    tuner = Tuner()
-    tuner.resume_scenario("mlp", "scenario_1", 100, 150, 1)
+    cifar10 = Cifar10(dim=3)
+    # tuner.convnet_tuner()
+    tuner.launch_scenario("convnet","scenario_convnet_3",cifar10.x_train, cifar10.y_train,cifar10.x_test, cifar10.y_test, 100)
