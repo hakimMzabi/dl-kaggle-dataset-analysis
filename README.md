@@ -17,7 +17,7 @@ Although we'll try to comment and precise every function and script in our files
 If this is the first time running this repository, launch:
 
 ```
-python tools\create_new_environment.py
+python -m tools.create_new_environment
 ```
 
 #### Jupyter notebooks
@@ -37,7 +37,7 @@ jupyter notebook
 You can also directly look for the models generated on this repository to compare the results by launching :
 
 ```
-python tools\tb.py
+python -m tools.tb
 ```
 
 #### Requirements
@@ -45,7 +45,7 @@ python tools\tb.py
 If you want to refresh the `requirements.txt` file with your current Anaconda environment packages, you can launch :
 
 ```
-python tools\refresh_requirements.py
+python -m tools.refresh_requirements
 ```
 
 #### Purge checkpoints
@@ -53,7 +53,7 @@ python tools\refresh_requirements.py
 If you want to purge the checkpoints folder, you can launch:
 
 ```
-python tools\purge_checkpoints.py
+python -m tools.purge_checkpoints
 ```
 
 #### Purge model
@@ -61,7 +61,7 @@ python tools\purge_checkpoints.py
 If you want to purge a model , you can launch:
 
 ```
-python tools\purge_model.py [model_name]
+python -m tools.purge_model [model_name]
 ```
 
 `[model_name]` in this case can be `mlp_100` for example.
