@@ -1,0 +1,24 @@
+=====convnet_6=====
+Epoch 1 - loss: 1.8163928842544557 ; sparse_categorical_accuracy : 0.3451400101184845 ; val_loss : 1.539639856338501 ; val_sparse_categorical_accuracy : 0.4528000056743622
+Epoch 2 - loss: 1.4421419510650635 ; sparse_categorical_accuracy : 0.4848000109195709 ; val_loss : 1.3536594160079956 ; val_sparse_categorical_accuracy : 0.5217999815940857
+Epoch 3 - loss: 1.274059965133667 ; sparse_categorical_accuracy : 0.5505800247192383 ; val_loss : 1.1809322916030884 ; val_sparse_categorical_accuracy : 0.5867999792098999
+Epoch 4 - loss: 1.1631945655059814 ; sparse_categorical_accuracy : 0.5906999707221985 ; val_loss : 1.1118914545059204 ; val_sparse_categorical_accuracy : 0.6122000217437744
+Epoch 5 - loss: 1.0894650686264038 ; sparse_categorical_accuracy : 0.6176599860191345 ; val_loss : 1.039610372543335 ; val_sparse_categorical_accuracy : 0.6391000151634216
+Epoch 6 - loss: 1.0304350590133666 ; sparse_categorical_accuracy : 0.640999972820282 ; val_loss : 1.0062634269714354 ; val_sparse_categorical_accuracy : 0.6473000049591064
+Epoch 7 - loss: 0.9865463871765137 ; sparse_categorical_accuracy : 0.6553999781608582 ; val_loss : 0.9480258114814758 ; val_sparse_categorical_accuracy : 0.6711999773979187
+Epoch 8 - loss: 0.9371135420799256 ; sparse_categorical_accuracy : 0.675000011920929 ; val_loss : 0.9341831469535827 ; val_sparse_categorical_accuracy : 0.6757000088691711
+Epoch 9 - loss: 0.9234459144592285 ; sparse_categorical_accuracy : 0.680840015411377 ; val_loss : 0.9531822888374328 ; val_sparse_categorical_accuracy : 0.6646999716758728
+Epoch 10 - loss: 0.8921648987388611 ; sparse_categorical_accuracy : 0.6901000142097473 ; val_loss : 0.9083208251953125 ; val_sparse_categorical_accuracy : 0.6863999962806702
+Epoch 11 - loss: 0.8663142530822754 ; sparse_categorical_accuracy : 0.6993799805641174 ; val_loss : 0.9049723574638366 ; val_sparse_categorical_accuracy : 0.6881999969482422
+Epoch 12 - loss: 0.8495286793327331 ; sparse_categorical_accuracy : 0.7061799764633179 ; val_loss : 0.8868986471176148 ; val_sparse_categorical_accuracy : 0.6940000057220459
+Epoch 13 - loss: 0.8293953903007507 ; sparse_categorical_accuracy : 0.7144200205802917 ; val_loss : 0.8727731935501098 ; val_sparse_categorical_accuracy : 0.7026000022888184
+Epoch 14 - loss: 0.8027912288856507 ; sparse_categorical_accuracy : 0.7234200239181519 ; val_loss : 0.8731541127204895 ; val_sparse_categorical_accuracy : 0.7002000212669373
+Epoch 15 - loss: 0.7945803964233399 ; sparse_categorical_accuracy : 0.7253599762916565 ; val_loss : 0.8657441153526306 ; val_sparse_categorical_accuracy : 0.6983000040054321
+Epoch 16 - loss: 0.7721258372116089 ; sparse_categorical_accuracy : 0.7328000068664551 ; val_loss : 0.8545685990333557 ; val_sparse_categorical_accuracy : 0.704800009727478
+Epoch 17 - loss: 0.7613178369140625 ; sparse_categorical_accuracy : 0.7353600263595581 ; val_loss : 0.8465306585311889 ; val_sparse_categorical_accuracy : 0.7042999863624573
+Epoch 18 - loss: 0.7444771377754211 ; sparse_categorical_accuracy : 0.7428799867630005 ; val_loss : 0.85279827709198 ; val_sparse_categorical_accuracy : 0.7059999704360962
+Epoch 19 - loss: 0.7380934555625915 ; sparse_categorical_accuracy : 0.7438399791717529 ; val_loss : 0.8590902600288391 ; val_sparse_categorical_accuracy : 0.7106000185012817
+Epoch 20 - loss: 0.7143241087913513 ; sparse_categorical_accuracy : 0.7537599802017212 ; val_loss : 0.8323478939056397 ; val_sparse_categorical_accuracy : 0.7171000242233276
+Epoch 21 - loss: 0.711237551574707 ; sparse_categorical_accuracy : 0.7526000142097473 ; val_loss : 0.8270987187385559 ; val_sparse_categorical_accuracy : 0.715499997138977
+Epoch 22 - loss: 0.6998896646690369 ; sparse_categorical_accuracy : 0.7585999965667725 ; val_loss : 0.8294178119659423 ; val_sparse_categorical_accuracy : 0.7182000279426575
+Epoch 23 - loss: 0.6800197305679321 ; sparse_categorical_accuracy : 0.7642800211906433 ; val_loss : 0.8170953353881836 ; val_sparse_categorical_accuracy : 0.7243000268936157

@@ -1,0 +1,6 @@
+NoDropout,Adam,tanh,1024,64,same,(6, 6)
+NoDropout,Adam,relu,1024,64,same,(6, 6)
+NoDropout,Adam,sigmoid,1024,64,same,(6, 6)
+DropoutDescending[0.5;0.4;],Adam,tanh,1024,64,same,(6, 6)
+DropoutDescending[0.5;0.4;],Adam,relu,1024,64,same,(6, 6)
+DropoutDescending[0.5;0.4;],Adam,sigmoid,1024,64,same,(6, 6)

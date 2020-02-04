@@ -1,0 +1,7 @@
+=====convnet_5=====
+Epoch 1 - loss: 1.8140091593933105 ; sparse_categorical_accuracy : 0.3441599905490875 ; val_loss : 1.5284423202514648 ; val_sparse_categorical_accuracy : 0.4458000063896179
+Epoch 2 - loss: 1.4404316971588136 ; sparse_categorical_accuracy : 0.483379989862442 ; val_loss : 1.338777264022827 ; val_sparse_categorical_accuracy : 0.5235000252723694
+Epoch 3 - loss: 1.2664823346328735 ; sparse_categorical_accuracy : 0.5505599975585938 ; val_loss : 1.1698528940200805 ; val_sparse_categorical_accuracy : 0.5827999711036682
+Epoch 4 - loss: 1.1393833386993408 ; sparse_categorical_accuracy : 0.5982999801635742 ; val_loss : 1.0355621726036073 ; val_sparse_categorical_accuracy : 0.6414999961853027
+Epoch 5 - loss: 1.0434080758476256 ; sparse_categorical_accuracy : 0.6325200200080872 ; val_loss : 0.979777080154419 ; val_sparse_categorical_accuracy : 0.6572999954223633
+Epoch 6 - loss: 0.9779069319725037 ; sparse_categorical_accuracy : 0.6577600240707397 ; val_loss : 1.0102467093467713 ; val_sparse_categorical_accuracy : 0.6449999809265137
