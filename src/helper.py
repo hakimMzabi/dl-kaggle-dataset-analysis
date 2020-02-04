@@ -1,21 +1,18 @@
 import os
-import re
+import shutil
 import datetime
 import tensorflow as tf
 import matplotlib.pyplot as plt
-import shutil
-import glob
-import multiprocessing
 
 from enum import Enum
-from pathlib import Path
 from src.reporter import Reporter
 from tensorflow.keras.datasets import cifar10
 
 
 class Helper:
     """
-    Helper class is here to help the developer debugging machine learning resources and variables and manage processes.
+    Helper class is here to help the developer debugging machine learning resources and variables.
+    It also helps to manage tensorflow processes.
     """
 
     class Bcolors(Enum):
@@ -239,7 +236,13 @@ class Helper:
         except FileNotFoundError:
             print("Error: Couldn't load the model. Check if the file exists.")
 
-    def load_model(self, name, id):
+    def get_model(self, name, id) -> object:
+        """
+        Returns a tensorflow keras model from a generated
+        :param name:
+        :param id:
+        :return:
+        """
         savepath = f"{self.src_path}\\models\\responses\\{name}_{id}.h5"
         return tf.keras.models.load_model(savepath)
 
@@ -317,7 +320,13 @@ class Helper:
             save_weights_only=True,
             verbose=1
         )
+
         tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_current_dir, histogram_freq=1)
+
+        earlystop_callback = tf.keras.EarlyStopping(
+            monitor="val_sparse_categorical_accuracy", min_delta=0.0001,
+            patience=1
+        )
 
         model.fit(
             x_train,
@@ -328,6 +337,7 @@ class Helper:
             callbacks=[
                 Reporter(x_train, y_train, batch_size, model_name, log_file_path, hp_log_title=hp_log_title),
                 cp_callback,
-                tensorboard_callback
+                tensorboard_callback,
+                earlystop_callback
             ]
         )
